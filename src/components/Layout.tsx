@@ -19,9 +19,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     const menuItems = [
         { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={18} /> },
-        { name: 'Leads Hub', path: '/leads', icon: <Users size={18} /> },
         { name: 'Launch Scraping', path: '/scraping', icon: <Play size={18} /> },
-        { name: 'Historial', path: '/executions', icon: <Clock size={18} /> },
+        { name: 'Leads Scraping', path: '/leads', icon: <Users size={18} /> },
+        { name: 'Historial Scraping', path: '/executions', icon: <Clock size={18} /> },
     ];
 
     if (!user) return <>{children}</>;
