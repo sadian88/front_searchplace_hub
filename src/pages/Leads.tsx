@@ -12,7 +12,7 @@ import {
     Search, Star, Tag,
     ChevronLeft, ChevronRight,
     ChevronFirst, ChevronLast, Globe, ExternalLink,
-    MapPin, Filter
+    MapPin, Filter, RotateCw
 } from 'lucide-react';
 
 const Leads: React.FC = () => {
@@ -180,6 +180,15 @@ const Leads: React.FC = () => {
                             className="w-full bg-zinc-900/50 border border-zinc-800 pl-9 pr-3 py-2 text-sm rounded-lg focus:ring-1 focus:ring-zinc-700 outline-none"
                         />
                     </div>
+                    <button
+                        onClick={fetchPlaces}
+                        disabled={loading}
+                        className="flex items-center gap-2 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-sm border border-zinc-700 transition-colors disabled:opacity-50"
+                        title="Actualizar listado"
+                    >
+                        <RotateCw size={14} className={loading ? 'animate-spin' : ''} />
+                        <span className="hidden md:inline">Actualizar</span>
+                    </button>
                     <button className="flex items-center gap-2 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-sm border border-zinc-700 transition-colors">
                         <Filter size={14} /> Filtros
                     </button>

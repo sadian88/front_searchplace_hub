@@ -11,7 +11,7 @@ import {
 import {
     ChevronLeft, ChevronRight,
     ChevronFirst, ChevronLast, Calendar,
-    ArrowRight, Activity
+    ArrowRight, Activity, RotateCw
 } from 'lucide-react';
 
 const Executions: React.FC = () => {
@@ -144,6 +144,14 @@ const Executions: React.FC = () => {
                     </h1>
                     <p className="text-zinc-500 text-sm">Registro de todas las ejecuciones lanzadas por el sistema</p>
                 </div>
+                <button
+                    onClick={fetchExecutions}
+                    disabled={loading}
+                    className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-sm border border-zinc-700 transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                >
+                    <RotateCw size={16} className={loading ? 'animate-spin' : ''} />
+                    <span>Actualizar Listado</span>
+                </button>
             </header>
 
             <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl overflow-hidden">
