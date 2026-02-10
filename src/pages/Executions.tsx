@@ -9,7 +9,7 @@ import {
     type PaginationState
 } from '@tanstack/react-table';
 import {
-    Search, ChevronLeft, ChevronRight,
+    ChevronLeft, ChevronRight,
     ChevronFirst, ChevronLast, Calendar,
     ArrowRight, Activity
 } from 'lucide-react';
@@ -112,8 +112,8 @@ const Executions: React.FC = () => {
                             onClick={() => isFinished && navigate(`/executions/${info.row.original.id}`)}
                             disabled={!isFinished}
                             className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg border transition-colors uppercase tracking-wider ${isFinished
-                                    ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700'
-                                    : 'bg-zinc-900/50 text-zinc-600 border-zinc-800 cursor-not-allowed opacity-50'
+                                ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700'
+                                : 'bg-zinc-900/50 text-zinc-600 border-zinc-800 cursor-not-allowed opacity-50'
                                 }`}
                         >
                             {info.row.original.status === 'running' ? 'Procesando...' : 'Ver Resultados'}

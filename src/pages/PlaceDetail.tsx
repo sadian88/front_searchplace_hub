@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import {
     ArrowLeft, Save, Trash2, Globe, MapPin, Phone,
-    Star, Tag, Calendar, ExternalLink, Loader2, CheckCircle
+    Star, Tag, Calendar, ExternalLink, Loader2
 } from 'lucide-react';
 
 const PlaceDetail: React.FC = () => {
