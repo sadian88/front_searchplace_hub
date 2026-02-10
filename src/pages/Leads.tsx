@@ -191,8 +191,8 @@ const Leads: React.FC = () => {
                 {[
                     { label: 'Total Encontrados', val: stats.total, color: 'text-zinc-100' },
                     { label: 'Página', val: `${pageIndex + 1} / ${pageCount}`, color: 'text-zinc-400' },
-                    { label: 'Dataset', val: 'PostgreSQL', color: 'text-zinc-400' },
-                    { label: 'Status', val: 'Live', color: 'text-emerald-500' },
+                    { label: 'Plan', val: 'Basic', color: 'text-zinc-400' },
+                    { label: 'Status', val: 'Active', color: 'text-emerald-500' },
                 ].map((stat, i) => (
                     <div key={i} className="bg-zinc-900/30 border border-zinc-800/50 p-4 rounded-xl">
                         <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">{stat.label}</p>
