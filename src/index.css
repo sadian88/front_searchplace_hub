@@ -1,15 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --color-zinc-950: #09090b;
 }
 
+:root {
+  /* Official Design Guide Palette */
+  --primary-mint: #4DCC9D;
+  --secondary-lavender: #9B94FF;
+  --tertiary-coral: #FF7B48;
+
+  --text-main: #1B1E32;
+  --text-body: #9295A3;
+
+  /* Reduced visual fatigue background - Softer tech-gray */
+  --bg-app: #F4F7FA;
+  --bg-card: #FFFFFF;
+}
+
 body {
-  background-color: #09090b;
-  color: #fafafa;
+  background: fixed linear-gradient(135deg, #F4F7FA 0%, #E2E8F0 100%);
+  color: var(--text-main);
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: 'Montserrat', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
 
 @layer utilities {
@@ -29,12 +46,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #e4e4e7;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #d4d4d8;
 }
 
 /* Animations */

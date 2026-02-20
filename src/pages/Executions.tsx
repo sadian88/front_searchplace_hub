@@ -11,7 +11,7 @@ import {
 import {
     ChevronLeft, ChevronRight,
     ChevronFirst, ChevronLast, Calendar,
-    ArrowRight, Activity, RotateCw
+    ArrowRight
 } from 'lucide-react';
 
 const Executions: React.FC = () => {
@@ -54,16 +54,16 @@ const Executions: React.FC = () => {
         columnHelper.accessor('created_at', {
             header: 'Fecha / Hora',
             cell: info => (
-                <div className="flex items-center gap-3 py-1">
-                    <div className="p-2 bg-zinc-800 rounded-lg text-zinc-500">
+                <div className="flex items-center gap-4 py-1">
+                    <div className="p-2.5 bg-[#4DCC9D]/10 border border-[#4DCC9D]/20 rounded-xl text-[#4DCC9D] shadow-sm">
                         <Calendar size={14} />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-zinc-100 font-medium text-sm">
+                        <span className="text-[#1B1E32] font-black text-sm tracking-tight text-nowrap">
                             {new Date(info.getValue()).toLocaleDateString()}
                         </span>
-                        <span className="text-zinc-500 text-[10px]">
-                            {new Date(info.getValue()).toLocaleTimeString()}
+                        <span className="text-[#9295A3] text-[10px] font-black uppercase tracking-widest">
+                            {new Date(info.getValue()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                     </div>
                 </div>
@@ -72,33 +72,37 @@ const Executions: React.FC = () => {
         columnHelper.accessor('search_term', {
             header: 'Búsqueda',
             cell: info => (
-                <div className="flex flex-col">
-                    <span className="text-zinc-200 font-semibold text-sm">{info.getValue()}</span>
-                    <span className="text-zinc-500 text-xs">{info.row.original.location}</span>
+                <div className="flex flex-col py-1">
+                    <span className="text-[#1B1E32] font-black text-sm tracking-tighter leading-tight">{info.getValue()}</span>
+                    <div className="flex items-center gap-1.5 text-[#9295A3]">
+                        <span className="text-[9px] uppercase font-black tracking-widest bg-[#EDF2F7]/40 px-2.5 py-0.5 rounded-lg border border-zinc-100">{info.row.original.location}</span>
+                    </div>
                 </div>
             )
         }),
         columnHelper.accessor('category', {
             header: 'Categoría',
-            cell: info => <span className="text-xs text-zinc-400 font-medium px-2 py-1 bg-zinc-800 rounded-md border border-zinc-700">{info.getValue() || 'N/A'}</span>
+            cell: info => <span className="text-[9px] text-[#9295A3] font-black uppercase tracking-[0.25em] px-3 py-1.5 bg-[#EDF2F7]/50 rounded-xl border border-zinc-100 shadow-inner">{info.getValue() || 'GENERAL'}</span>
         }),
         columnHelper.accessor('status', {
             header: 'Estado',
             cell: info => {
                 const statusStyles: any = {
-                    'running': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-                    'terminado': 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-                    'fallido': 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                    'running': 'bg-[#9B94FF]/10 text-[#9B94FF] border-[#9B94FF]/20 shadow-[#9B94FF]/5',
+                    'terminado': 'bg-[#4DCC9D]/10 text-[#4DCC9D] border-[#4DCC9D]/20 shadow-[#4DCC9D]/5',
+                    'fallido': 'bg-[#FF7B48]/10 text-[#FF7B48] border-[#FF7B48]/20 shadow-[#FF7B48]/5'
                 };
                 const labels: any = {
-                    'running': 'En Proceso',
+                    'running': 'Procesando',
                     'terminado': 'Finalizado',
                     'fallido': 'Error'
                 };
                 return (
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border ${statusStyles[info.getValue()] || statusStyles.running}`}>
-                        {labels[info.getValue()] || info.getValue()}
-                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className={`text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-xl border ${statusStyles[info.getValue()] || statusStyles.running} shadow-sm animate-in fade-in zoom-in-90`}>
+                            {labels[info.getValue()] || info.getValue()}
+                        </span>
+                    </div>
                 );
             }
         }),
@@ -111,13 +115,14 @@ const Executions: React.FC = () => {
                         <button
                             onClick={() => isFinished && navigate(`/executions/${info.row.original.id}`)}
                             disabled={!isFinished}
-                            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg border transition-colors uppercase tracking-wider ${isFinished
-                                ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700'
-                                : 'bg-zinc-900/50 text-zinc-600 border-zinc-800 cursor-not-allowed opacity-50'
+                            className={`flex items-center gap-3 px-6 py-2.5 text-[10px] font-black rounded-[14px] border transition-all uppercase tracking-widest group shadow-sm
+                                ${isFinished
+                                    ? 'bg-[#1B1E32] hover:bg-black text-white border-transparent active:scale-95'
+                                    : 'bg-zinc-50 text-zinc-300 border-zinc-100 cursor-not-allowed'
                                 }`}
                         >
-                            {info.row.original.status === 'running' ? 'Procesando...' : 'Ver Resultados'}
-                            <ArrowRight size={14} />
+                            {info.row.original.status === 'running' ? 'Cargando' : 'Ver Resultados'}
+                            <ArrowRight size={14} className={`transition-transform duration-300 ${isFinished ? 'group-hover:translate-x-1' : ''}`} />
                         </button>
                     </div>
                 );
@@ -136,50 +141,42 @@ const Executions: React.FC = () => {
     });
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <header className="flex flex-col md:flex-row justify-between items-end gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
-                        <Activity className="text-zinc-500" size={24} /> Historial de Scraping
-                    </h1>
-                    <p className="text-zinc-500 text-sm">Registro de todas las ejecuciones lanzadas por el sistema</p>
-                </div>
-                <button
-                    onClick={fetchExecutions}
-                    disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-sm border border-zinc-700 transition-all shadow-lg active:scale-95 disabled:opacity-50"
-                >
-                    <RotateCw size={16} className={loading ? 'animate-spin' : ''} />
-                    <span>Actualizar Listado</span>
-                </button>
+        <div className="space-y-10 animate-in fade-in duration-700 pb-10 font-medium">
+            <header className="flex flex-col space-y-3">
+                <h1 className="text-4xl lg:text-5xl font-black text-[#1B1E32] tracking-tighter">
+                    Historial de Búsquedas
+                </h1>
+                <p className="text-[#9295A3] text-sm font-bold indent-1 border-l-4 border-[#4DCC9D] pl-4">Registro detallado de tus búsquedas de lugares en el mapa</p>
             </header>
 
-            <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl overflow-hidden">
+            <div className="bg-white border border-zinc-100 rounded-[2.75rem] overflow-hidden shadow-2xl shadow-zinc-200/40">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-zinc-800/50">
+                        <thead>
                             {table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id}>
+                                <tr key={headerGroup.id} className="bg-[#EDF2F7]/50 border-b border-zinc-100">
                                     {headerGroup.headers.map(header => (
-                                        <th key={header.id} className="px-6 py-3 text-xs font-bold text-zinc-500 uppercase tracking-tight border-b border-zinc-800">
+                                        <th key={header.id} className="px-10 py-5 text-[10px] font-black text-[#9295A3] uppercase tracking-[0.25em]">
                                             {flexRender(header.column.columnDef.header, header.getContext())}
                                         </th>
                                     ))}
                                 </tr>
                             ))}
                         </thead>
-                        <tbody className="divide-y divide-zinc-800/50">
+                        <tbody className="divide-y divide-[#EDF2F7]">
                             {loading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i} className="animate-pulse">
-                                        <td colSpan={4} className="px-6 py-4 h-16 bg-zinc-900/20"></td>
+                                        <td colSpan={5} className="px-10 py-8 h-24">
+                                            <div className="h-full bg-zinc-50 rounded-[1.5rem]" />
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
                                 table.getRowModel().rows.map(row => (
-                                    <tr key={row.id} className="hover:bg-zinc-800/30 transition-colors">
+                                    <tr key={row.id} className="hover:bg-[#EDF2F7]/20 transition-all duration-300 group">
                                         {row.getVisibleCells().map(cell => (
-                                            <td key={cell.id} className="px-6 py-3 text-sm text-zinc-300">
+                                            <td key={cell.id} className="px-10 py-4 transition-colors">
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </td>
                                         ))}
@@ -190,53 +187,44 @@ const Executions: React.FC = () => {
                     </table>
                 </div>
 
-                <div className="flex items-center justify-between px-6 py-4 bg-zinc-900/20 border-t border-zinc-800">
-                    <span className="text-zinc-600 text-[11px] font-medium hidden md:block">
-                        Mostrando página {pageIndex + 1} de {pageCount}
-                    </span>
+                <div className="flex items-center justify-between px-10 py-8 bg-[#EDF2F7]/10 border-t border-zinc-100">
+                    <div className="flex items-center gap-4">
+                        <span className="text-[#9295A3] text-[10px] font-black uppercase tracking-widest hidden md:block px-5 py-2.5 bg-white rounded-full border border-zinc-100 shadow-sm">
+                            <span className="text-[#1B1E32]">{pageIndex + 1}</span> <span className="mx-2 opacity-30">/</span> {pageCount}
+                        </span>
+                    </div>
 
                     <div className="flex items-center gap-2">
-                        <button
-                            className="p-1.5 rounded-md hover:bg-zinc-800 text-zinc-500 disabled:opacity-25 transition-colors"
-                            onClick={() => table.setPageIndex(0)}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            <ChevronFirst size={16} />
-                        </button>
-                        <button
-                            className="p-1.5 rounded-md hover:bg-zinc-800 text-zinc-500 disabled:opacity-25 transition-colors"
-                            onClick={() => table.previousPage()}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            <ChevronLeft size={16} />
-                        </button>
-
-                        <button
-                            className="p-1.5 rounded-md hover:bg-zinc-800 text-zinc-500 disabled:opacity-25 transition-colors"
-                            onClick={() => table.nextPage()}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            <ChevronRight size={16} />
-                        </button>
-                        <button
-                            className="p-1.5 rounded-md hover:bg-zinc-800 text-zinc-500 disabled:opacity-25 transition-colors"
-                            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            <ChevronLast size={16} />
-                        </button>
+                        {[
+                            { icon: <ChevronFirst size={18} />, onClick: () => table.setPageIndex(0), disabled: !table.getCanPreviousPage() },
+                            { icon: <ChevronLeft size={18} />, onClick: () => table.previousPage(), disabled: !table.getCanPreviousPage() },
+                            { icon: <ChevronRight size={18} />, onClick: () => table.nextPage(), disabled: !table.getCanNextPage() },
+                            { icon: <ChevronLast size={18} />, onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() },
+                        ].map((btn, i) => (
+                            <button
+                                key={i}
+                                className="p-3.5 rounded-2xl border border-zinc-100 bg-white hover:bg-[#4DCC9D]/10 hover:text-[#4DCC9D] text-[#9295A3] disabled:opacity-20 transition-all shadow-sm active:scale-90"
+                                onClick={btn.onClick}
+                                disabled={btn.disabled}
+                            >
+                                {btn.icon}
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
 
             {data.length === 0 && !loading && (
-                <div className="text-center py-20 bg-zinc-900/40 rounded-xl border border-dashed border-zinc-800">
-                    <p className="text-zinc-500 text-sm tracking-widest uppercase font-bold">No hay ejecuciones registradas</p>
+                <div className="text-center py-24 bg-white rounded-[3.5rem] border-4 border-dashed border-[#EDF2F7] shadow-inner group">
+                    <div className="p-8 bg-[#4DCC9D]/5 rounded-full w-fit mx-auto mb-8 group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                        <Calendar size={48} className="text-[#4DCC9D]" />
+                    </div>
+                    <p className="text-[#1B1E32] text-xs tracking-[0.35em] uppercase font-black mb-10">No hay búsquedas registradas</p>
                     <button
-                        onClick={() => navigate('/scraping')}
-                        className="mt-4 px-6 py-2 bg-zinc-100 text-zinc-900 font-bold rounded-xl text-xs uppercase"
+                        onClick={() => navigate('/buscador')}
+                        className="px-14 py-4.5 bg-[#4DCC9D] text-white font-black rounded-[2rem] text-xs uppercase tracking-widest hover:bg-[#3CB388] transition-all shadow-2xl shadow-[#4DCC9D]/30 active:scale-95"
                     >
-                        Lanzar mi primer Scraping
+                        Comenzar Nueva Búsqueda
                     </button>
                 </div>
             )}
