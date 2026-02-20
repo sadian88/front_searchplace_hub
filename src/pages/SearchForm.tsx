@@ -23,7 +23,7 @@ const SearchForm: React.FC = () => {
         longitude: -74.0817 as any,
         has_website: true,
         exact_name: '',
-        search_type: 'default' as 'default' | 'circle' | 'polygon',
+        search_type: 'circle' as 'circle' | 'polygon',
         radius: 1,
         polygon_points: [] as [number, number][],
         max_leads: 50
@@ -213,7 +213,6 @@ const SearchForm: React.FC = () => {
 
                                 <div className="flex gap-1.5 p-1.5 bg-[#EDF2F7]/50 border border-zinc-100 rounded-[1.75rem]">
                                     {[
-                                        { id: 'default', label: 'Centro', icon: <MapPin size={14} /> },
                                         { id: 'circle', label: 'Círculo', icon: <CircleIcon size={14} /> },
                                         { id: 'polygon', label: 'Polígono', icon: <Hexagon size={14} /> }
                                     ].map(type => (
