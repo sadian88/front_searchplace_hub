@@ -193,8 +193,7 @@ const Leads: React.FC = () => {
                 {[
                     { label: 'Total Encontrados', val: stats.total, color: 'text-[#1B1E32]', bg: 'bg-white', icon: <Search size={16} className="text-[#9295A3]" /> },
                     { label: 'Página Actual', val: `${pageIndex + 1} de ${pageCount}`, color: 'text-[#1B1E32]', bg: 'bg-white', icon: <Tag size={16} className="text-[#4DCC9D]" /> },
-                    { label: 'Dataset', val: 'PostgreSQL', color: 'text-[#1B1E32]', bg: 'bg-white', icon: <Star size={16} className="text-amber-400" /> },
-                    { label: 'Estado', val: 'Activo', color: 'text-[#4DCC9D]', bg: 'bg-[#4DCC9D]/5', icon: <Globe size={16} className="text-[#4DCC9D]" /> },
+                    { label: 'Estado del Motor', val: 'Activo', color: 'text-[#4DCC9D]', bg: 'bg-[#4DCC9D]/5', icon: <Globe size={16} className="text-[#4DCC9D]" /> },
                 ].map((stat, i) => (
                     <div key={i} className={`border border-zinc-100/80 p-6 rounded-[2.25rem] shadow-xl shadow-zinc-200/30 flex items-center gap-5 ${stat.bg} hover:-translate-y-1 transition-all group`}>
                         <div className="p-4 bg-[#EDF2F7]/50 border border-zinc-100 rounded-2xl group-hover:scale-110 transition-transform">

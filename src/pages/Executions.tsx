@@ -11,12 +11,38 @@ import {
 import {
     ChevronLeft, ChevronRight,
     ChevronFirst, ChevronLast, Calendar,
-    ArrowRight
+    ArrowRight, Loader2
 } from 'lucide-react';
+
+const TimeCounter: React.FC<{ startTime: string, status: string }> = ({ startTime, status }) => {
+    const [elapsed, setElapsed] = useState('');
+
+    useEffect(() => {
+        if (status !== 'running') return;
+
+        const update = () => {
+            const start = new Date(startTime).getTime();
+            const now = new Date().getTime();
+            const diff = Math.floor((now - start) / 1000);
+
+            const m = Math.floor(diff / 60);
+            const s = diff % 60;
+            setElapsed(`${m}:${s.toString().padStart(2, '0')}`);
+        };
+
+        update();
+        const interval = setInterval(update, 1000);
+        return () => clearInterval(interval);
+    }, [startTime, status]);
+
+    if (status !== 'running') return null;
+    return <span className="text-[10px] font-black font-mono ml-2 opacity-70 tracking-tighter">{elapsed}</span>;
+}
 
 const Executions: React.FC = () => {
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const navigate = useNavigate();
 
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
@@ -26,8 +52,10 @@ const Executions: React.FC = () => {
 
     const [pageCount, setPageCount] = useState(0);
 
-    const fetchExecutions = async () => {
-        setLoading(true);
+    const fetchExecutions = async (silent = false) => {
+        if (!silent) setLoading(true);
+        else setIsRefreshing(true);
+
         try {
             const response = await api.get('/executions', {
                 params: {
@@ -42,11 +70,20 @@ const Executions: React.FC = () => {
             setData([]);
         } finally {
             setLoading(false);
+            setIsRefreshing(false);
         }
     };
 
     useEffect(() => {
         fetchExecutions();
+    }, [pageIndex, pageSize]);
+
+    // Auto-refresh logic every 10 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchExecutions(true);
+        }, 10000);
+        return () => clearInterval(interval);
     }, [pageIndex, pageSize]);
 
     const columnHelper = createColumnHelper<any>();
@@ -80,27 +117,31 @@ const Executions: React.FC = () => {
                 </div>
             )
         }),
-        columnHelper.accessor('category', {
-            header: 'Categoría',
-            cell: info => <span className="text-[9px] text-[#9295A3] font-black uppercase tracking-[0.25em] px-3 py-1.5 bg-[#EDF2F7]/50 rounded-xl border border-zinc-100 shadow-inner">{info.getValue() || 'GENERAL'}</span>
-        }),
         columnHelper.accessor('status', {
             header: 'Estado',
             cell: info => {
+                const status = info.getValue();
                 const statusStyles: any = {
                     'running': 'bg-[#9B94FF]/10 text-[#9B94FF] border-[#9B94FF]/20 shadow-[#9B94FF]/5',
                     'terminado': 'bg-[#4DCC9D]/10 text-[#4DCC9D] border-[#4DCC9D]/20 shadow-[#4DCC9D]/5',
                     'fallido': 'bg-[#FF7B48]/10 text-[#FF7B48] border-[#FF7B48]/20 shadow-[#FF7B48]/5'
                 };
                 const labels: any = {
-                    'running': 'Procesando',
+                    'running': 'En Progreso',
                     'terminado': 'Finalizado',
                     'fallido': 'Error'
                 };
                 return (
                     <div className="flex items-center gap-2">
-                        <span className={`text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-xl border ${statusStyles[info.getValue()] || statusStyles.running} shadow-sm animate-in fade-in zoom-in-90`}>
-                            {labels[info.getValue()] || info.getValue()}
+                        <span className={`flex items-center text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-xl border ${statusStyles[status] || statusStyles.running} shadow-sm transition-all duration-500`}>
+                            {status === 'running' && (
+                                <span className="flex h-2 w-2 mr-2 relative">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9B94FF] opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9B94FF]"></span>
+                                </span>
+                            )}
+                            {labels[status] || status}
+                            <TimeCounter startTime={info.row.original.created_at} status={status} />
                         </span>
                     </div>
                 );
@@ -121,7 +162,7 @@ const Executions: React.FC = () => {
                                     : 'bg-zinc-50 text-zinc-300 border-zinc-100 cursor-not-allowed'
                                 }`}
                         >
-                            {info.row.original.status === 'running' ? 'Cargando' : 'Ver Resultados'}
+                            {info.row.original.status === 'running' ? 'Extrayendo...' : 'Ver Resultados'}
                             <ArrowRight size={14} className={`transition-transform duration-300 ${isFinished ? 'group-hover:translate-x-1' : ''}`} />
                         </button>
                     </div>
@@ -142,9 +183,14 @@ const Executions: React.FC = () => {
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700 pb-10 font-medium">
-            <header className="flex flex-col space-y-3">
+            <header className="flex flex-col space-y-3 relative">
                 <h1 className="text-4xl lg:text-5xl font-black text-[#1B1E32] tracking-tighter">
                     Historial de Búsquedas
+                    {isRefreshing && (
+                        <span className="ml-4 inline-flex items-center gap-2 text-[10px] font-black text-[#4DCC9D] uppercase tracking-widest animate-pulse">
+                            <Loader2 size={12} className="animate-spin" /> Actualizando...
+                        </span>
+                    )}
                 </h1>
                 <p className="text-[#9295A3] text-sm font-bold indent-1 border-l-4 border-[#4DCC9D] pl-4">Registro detallado de tus búsquedas de lugares en el mapa</p>
             </header>
