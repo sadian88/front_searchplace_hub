@@ -21,7 +21,6 @@ const SearchForm: React.FC = () => {
         postal_code: '',
         latitude: 4.6097 as any,
         longitude: -74.0817 as any,
-        category: 'Restaurante',
         has_website: true,
         exact_name: '',
         search_type: 'default' as 'default' | 'circle' | 'polygon',
@@ -42,8 +41,7 @@ const SearchForm: React.FC = () => {
                     const defaultCat = cats.includes('Restaurante') ? 'Restaurante' : cats[0];
                     setFormData(prev => ({
                         ...prev,
-                        search_term: defaultCat,
-                        category: defaultCat
+                        search_term: defaultCat
                     }));
                 }
             } catch (error) {
@@ -67,6 +65,7 @@ const SearchForm: React.FC = () => {
         try {
             const submissionData = {
                 ...formData,
+                category: formData.search_term, // Send search_term as category for backend compatibility
                 postal_code: formData.postal_code || null,
                 latitude: formData.latitude === '' ? null : formData.latitude,
                 longitude: formData.longitude === '' ? null : formData.longitude
@@ -158,27 +157,10 @@ const SearchForm: React.FC = () => {
 
                         <div className="space-y-6">
                             <h3 className="text-[10px] font-black text-[#9295A3] uppercase tracking-[0.25em] flex items-center gap-2">
-                                <Filter size={14} className="text-[#9B94FF]" /> Filtros Dinámicos
+                                <Filter size={14} className="text-[#9B94FF]" /> Filtros Adicionales
                             </h3>
 
                             <div className="space-y-5">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-[#9295A3] uppercase tracking-widest ml-1">Categoría</label>
-                                    <input
-                                        name="category"
-                                        list="search-categories"
-                                        value={formData.category}
-                                        onChange={handleChange}
-                                        className="w-full bg-[#EDF2F7]/50 border border-zinc-100 text-[#1B1E32] rounded-[1.25rem] px-5 py-4 text-sm focus:border-[#4DCC9D] focus:ring-4 focus:ring-[#4DCC9D]/5 outline-none transition-all shadow-inner font-semibold"
-                                        placeholder="Selecciona..."
-                                    />
-                                    <datalist id="search-categories">
-                                        {categories.map((cat, idx) => (
-                                            <option key={idx} value={cat} />
-                                        ))}
-                                    </datalist>
-                                </div>
-
                                 <div className="flex items-center gap-4 p-5 bg-[#4DCC9D]/5 rounded-[1.5rem] border border-[#4DCC9D]/20 group cursor-pointer active:scale-95 transition-all">
                                     <input
                                         type="checkbox"
