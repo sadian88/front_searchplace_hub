@@ -25,7 +25,7 @@ const Login: React.FC = () => {
             const response = await api.post(endpoint, { username, password });
 
             if (isLogin) {
-                login(response.data.token, response.data.user);
+                login(response.data.token);
                 navigate('/');
             } else {
                 setIsLogin(true);
