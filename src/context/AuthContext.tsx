@@ -1,40 +1,90 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import api from '../api/api';
+
+/* ── tipos ────────────────────────────────────────────────────────────────── */
+
+export interface UserPlan {
+    id: number;
+    name: string;
+    display_name: string;
+    price_monthly: number;
+    max_leads_per_search: number | null;    // null = unlimited
+    max_concurrent_searches: number | null; // null = unlimited
+    max_leads_monthly: number | null;       // null = unlimited
+    can_export_csv: boolean;
+    can_export_api: boolean;
+    support_level: string;
+}
+
+export interface AuthUser {
+    id: number;
+    username: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    plan: UserPlan;
+}
 
 interface AuthContextType {
-    user: any;
-    login: (token: string, user: any) => void;
-    logout: () => void;
+    user: AuthUser | null;
     loading: boolean;
+    login: (token: string) => Promise<void>;
+    logout: () => void;
+    refreshUser: () => Promise<void>;
 }
+
+/* ── contexto ─────────────────────────────────────────────────────────────── */
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+    /**
+     * Consulta /api/auth/me usando el JWT almacenado.
+     * El usuario en memoria siempre viene del servidor — nunca de localStorage.
+     */
+    const fetchMe = useCallback(async (): Promise<boolean> => {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+
+        try {
+            const { data } = await api.get<AuthUser>('/auth/me');
+            setUser(data);
+            return true;
+        } catch {
+            // Token inválido o expirado — limpiar
+            localStorage.removeItem('token');
+            return false;
         }
-        setLoading(false);
     }, []);
 
-    const login = (token: string, userData: any) => {
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
-    };
+    // Hidratar al montar
+    useEffect(() => {
+        fetchMe().finally(() => setLoading(false));
+    }, [fetchMe]);
 
-    const logout = () => {
+    /**
+     * login: recibe el token del servidor, lo persiste y obtiene los datos
+     * del usuario directamente desde la API. Nunca almacena el objeto user.
+     */
+    const login = useCallback(async (token: string) => {
+        localStorage.setItem('token', token);
+        await fetchMe();
+    }, [fetchMe]);
+
+    const logout = useCallback(() => {
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
         setUser(null);
-    };
+    }, []);
+
+    const refreshUser = useCallback(async () => {
+        await fetchMe();
+    }, [fetchMe]);
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
             {children}
         </AuthContext.Provider>
     );

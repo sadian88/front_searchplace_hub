@@ -23,8 +23,8 @@ export default function SignInForm() {
     setError('');
     try {
       const response = await api.post('/auth/login', { username, password });
-      login(response.data.token, response.data.user);
-      navigate('/');
+      await login(response.data.token);
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Usuario o contraseña incorrectos');
     } finally {
@@ -41,17 +41,18 @@ export default function SignInForm() {
               Iniciar Sesión
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Ingresa tus credenciales para acceder al hub de búsqueda.
+              Ingresa con tu email para acceder al hub de búsqueda.
             </p>
           </div>
           <form onSubmit={handleSubmit}>
             <div className="space-y-6">
               <div>
                 <Label>
-                  Usuario <span className="text-error-500">*</span>
+                  Email <span className="text-error-500">*</span>
                 </Label>
                 <Input
-                  placeholder="usuario"
+                  type="email"
+                  placeholder="tu@empresa.com"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />

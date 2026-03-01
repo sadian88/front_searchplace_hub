@@ -1,21 +1,23 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import api from '../../api/api';
+import { useAuth } from '../../context/AuthContext';
 import {
     useReactTable,
     getCoreRowModel,
     flexRender,
     createColumnHelper,
-    type PaginationState
+    type PaginationState,
 } from '@tanstack/react-table';
 import {
-    ChevronLeft, ChevronRight,
-    ChevronFirst, ChevronLast, Calendar,
-    ArrowRight, Loader2
+    ChevronLeft, ChevronRight, ChevronFirst, ChevronLast,
+    Calendar, ArrowRight, Loader2, Users, TrendingUp, AlertTriangle,
 } from 'lucide-react';
-import PageMeta from "../../components/common/PageMeta";
+import PageMeta from '../../components/common/PageMeta';
 
-const TimeCounter = ({ startTime, status }: { startTime: string, status: string }) => {
+/* ── time counter for running executions ─────────────────────────────────── */
+
+const TimeCounter = ({ startTime, status }: { startTime: string; status: string }) => {
     const [elapsed, setElapsed] = useState('');
     useEffect(() => {
         if (status !== 'running') return;
@@ -31,23 +33,127 @@ const TimeCounter = ({ startTime, status }: { startTime: string, status: string 
     return <span className="text-[10px] font-mono ml-2 opacity-60">{elapsed}</span>;
 };
 
+/* ── monthly usage banner ────────────────────────────────────────────────── */
+
+interface MonthlyUsage { used: number; limit: number | null; percent: number | null }
+
+function UsageBanner({ usage }: { usage: MonthlyUsage | null }) {
+    if (!usage) return null;
+
+    if (usage.limit === null) {
+        return (
+            <div className="flex items-center gap-3 px-5 py-3.5 bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-2xl">
+                <TrendingUp size={16} className="text-success-500 shrink-0" />
+                <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-gray-700 dark:text-white/80">
+                        {usage.used.toLocaleString()} leads obtenidos este mes
+                    </p>
+                    <p className="text-[10px] text-gray-400 font-semibold mt-0.5">Plan sin límite mensual</p>
+                </div>
+            </div>
+        );
+    }
+
+    const pct = usage.percent ?? 0;
+    const isWarning = pct >= 70 && pct < 90;
+    const isDanger  = pct >= 90;
+
+    const barColor = isDanger  ? 'bg-error-500'
+                   : isWarning ? 'bg-amber-400'
+                   : 'bg-brand-500';
+
+    const textColor = isDanger  ? 'text-error-600 dark:text-error-400'
+                    : isWarning ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-gray-700 dark:text-white/80';
+
+    const borderColor = isDanger  ? 'border-error-200 dark:border-error-500/20 bg-error-50 dark:bg-error-500/10'
+                      : isWarning ? 'border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/10'
+                      : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40';
+
+    return (
+        <div className={`flex items-center gap-4 px-5 py-3.5 border rounded-2xl ${borderColor}`}>
+            {isDanger
+                ? <AlertTriangle size={16} className="text-error-500 shrink-0" />
+                : <TrendingUp size={16} className={`shrink-0 ${isWarning ? 'text-amber-500' : 'text-brand-500'}`} />
+            }
+            <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1.5">
+                    <p className={`text-xs font-bold ${textColor}`}>
+                        {usage.used.toLocaleString()} / {usage.limit.toLocaleString()} leads este mes
+                    </p>
+                    <span className={`text-[10px] font-extrabold tabular-nums ${textColor}`}>{pct}%</span>
+                </div>
+                <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                        className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                        style={{ width: `${pct}%` }}
+                    />
+                </div>
+                {isDanger && (
+                    <p className="text-[10px] text-error-500 font-semibold mt-1">
+                        Límite mensual alcanzado · Actualiza tu plan para continuar
+                    </p>
+                )}
+            </div>
+        </div>
+    );
+}
+
+/* ── main component ──────────────────────────────────────────────────────── */
+
 const Executions = () => {
+    const { user } = useAuth();
+    const navigate  = useNavigate();
+
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const navigate = useNavigate();
+    const [monthlyUsage, setMonthlyUsage] = useState<MonthlyUsage | null>(null);
+
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
     const [pageCount, setPageCount] = useState(0);
 
-    const fetchExecutions = async (silent = false) => {
+    const maxLeadsPerSearch = user?.plan.max_leads_per_search ?? null;
+
+    const refreshUsage = () =>
+        api.get('/executions/usage/monthly').then(r => setMonthlyUsage(r.data)).catch(() => {});
+
+    /* sync running executions with Apify, returns true if any finished */
+    const syncRunning = async (executions: any[]): Promise<boolean> => {
+        const running = executions.filter((e: any) => e.status === 'running');
+        if (running.length === 0) return false;
+
+        const results = await Promise.allSettled(
+            running.map((e: any) => api.get(`/executions/${e.id}/sync`))
+        );
+
+        return results.some(r =>
+            r.status === 'fulfilled' &&
+            r.value.data.status !== 'running' &&
+            !r.value.data.already_done
+        );
+    };
+
+    /* fetch executions (+ sync running ones) */
+    const fetchAll = async (silent = false) => {
         if (!silent) setLoading(true);
         else setIsRefreshing(true);
         try {
-            const response = await api.get('/executions', { params: { page: pageIndex + 1, limit: pageSize } });
-            setData(response.data.data || []);
+            const params = { page: pageIndex + 1, limit: pageSize };
+            const response = await api.get('/executions', { params });
+            const executions: any[] = response.data.data || [];
+            setData(executions);
             setPageCount(response.data.pagination.totalPages || 0);
-        } catch (error) {
-            console.error(error);
+
+            const anyFinished = await syncRunning(executions);
+            if (anyFinished) {
+                // Re-fetch to get updated status and results_count
+                const updated = await api.get('/executions', { params });
+                setData(updated.data.data || []);
+                setPageCount(updated.data.pagination.totalPages || 0);
+                refreshUsage();
+            }
+        } catch {
             setData([]);
         } finally {
             setLoading(false);
@@ -55,14 +161,21 @@ const Executions = () => {
         }
     };
 
-    useEffect(() => { fetchExecutions(); }, [pageIndex, pageSize]);
+    /* fetch monthly usage once on mount */
+    useEffect(() => { refreshUsage(); }, []);
 
+    useEffect(() => { fetchAll(); }, [pageIndex, pageSize]);
+
+    /* auto-refresh every 10 s */
     useEffect(() => {
-        const interval = setInterval(() => fetchExecutions(true), 10000);
+        const interval = setInterval(() => fetchAll(true), 10_000);
         return () => clearInterval(interval);
     }, [pageIndex, pageSize]);
 
+    /* ── columns ──────────────────────────────────────────────────────────── */
+
     const columnHelper = createColumnHelper<any>();
+
     const columns = useMemo(() => [
         columnHelper.accessor('created_at', {
             header: 'Fecha / Hora',
@@ -80,27 +193,76 @@ const Executions = () => {
                         </span>
                     </div>
                 </div>
-            )
+            ),
         }),
         columnHelper.accessor('search_term', {
             header: 'Búsqueda',
             cell: info => (
                 <div className="flex flex-col py-1">
                     <span className="text-gray-800 dark:text-white/90 font-semibold text-sm tracking-tight">{info.getValue()}</span>
-                    <span className="text-[9px] uppercase font-semibold tracking-wider bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-md border border-gray-200 dark:border-gray-600 w-fit mt-1">{info.row.original.location}</span>
+                    <span className="text-[9px] uppercase font-semibold tracking-wider bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-md border border-gray-200 dark:border-gray-600 w-fit mt-1">
+                        {info.row.original.location}
+                    </span>
                 </div>
-            )
+            ),
+        }),
+        columnHelper.accessor('results_count', {
+            header: 'Resultados',
+            cell: info => {
+                const status = info.row.original.status;
+                const count: number = info.getValue() ?? 0;
+
+                if (status === 'running') {
+                    return (
+                        <span className="inline-flex items-center gap-1.5 text-[10px] text-purple-500 font-semibold">
+                            <Loader2 size={11} className="animate-spin" /> Extrayendo...
+                        </span>
+                    );
+                }
+                if (status === 'fallido' || count === 0) {
+                    return <span className="text-gray-300 dark:text-gray-600 text-sm">—</span>;
+                }
+
+                /* saturation bar vs plan limit */
+                const pct = maxLeadsPerSearch ? Math.min(100, Math.round((count / maxLeadsPerSearch) * 100)) : null;
+                const isFull = pct !== null && pct >= 100;
+
+                return (
+                    <div className="flex flex-col gap-1 min-w-[90px]">
+                        <div className="flex items-center gap-1.5">
+                            <Users size={11} className="text-brand-400 shrink-0" />
+                            <span className="text-sm font-bold text-gray-800 dark:text-white/90 tabular-nums">{count}</span>
+                            {maxLeadsPerSearch && (
+                                <span className="text-[10px] text-gray-400 font-semibold">/ {maxLeadsPerSearch}</span>
+                            )}
+                        </div>
+                        {pct !== null && (
+                            <div className="flex items-center gap-1.5">
+                                <div className="flex-1 h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full rounded-full ${isFull ? 'bg-amber-400' : 'bg-brand-400'}`}
+                                        style={{ width: `${pct}%` }}
+                                    />
+                                </div>
+                                <span className={`text-[9px] font-bold tabular-nums ${isFull ? 'text-amber-500' : 'text-gray-400'}`}>
+                                    {pct}%
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                );
+            },
         }),
         columnHelper.accessor('status', {
             header: 'Estado',
             cell: info => {
                 const status = info.getValue();
                 const s: any = {
-                    'running': 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
-                    'terminado': 'bg-success-50 text-success-600 border-success-200 dark:bg-success-500/10 dark:text-success-400 dark:border-success-500/20',
-                    'fallido': 'bg-error-50 text-error-600 border-error-200 dark:bg-error-500/10 dark:text-error-400 dark:border-error-500/20'
+                    running:   'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
+                    terminado: 'bg-success-50 text-success-600 border-success-200 dark:bg-success-500/10 dark:text-success-400 dark:border-success-500/20',
+                    fallido:   'bg-error-50 text-error-600 border-error-200 dark:bg-error-500/10 dark:text-error-400 dark:border-error-500/20',
                 };
-                const labels: any = { 'running': 'En Progreso', 'terminado': 'Finalizado', 'fallido': 'Error' };
+                const labels: any = { running: 'En Progreso', terminado: 'Finalizado', fallido: 'Error' };
                 return (
                     <span className={`inline-flex items-center text-[10px] font-semibold uppercase tracking-widest px-3 py-1.5 rounded-lg border ${s[status] || s.running}`}>
                         {status === 'running' && (
@@ -113,28 +275,32 @@ const Executions = () => {
                         <TimeCounter startTime={info.row.original.created_at} status={status} />
                     </span>
                 );
-            }
+            },
         }),
-        columnHelper.accessor('actions', {
+        columnHelper.accessor('actions' as any, {
             header: '',
             cell: info => {
                 const isFinished = info.row.original.status === 'terminado';
                 return (
                     <div className="flex justify-end">
                         <button
-                            onClick={() => isFinished && navigate(`/executions/${info.row.original.id}`)}
+                            onClick={() => isFinished && navigate(`/leads?execution=${info.row.original.id}`)}
                             disabled={!isFinished}
                             className={`flex items-center gap-2 px-5 py-2 text-[10px] font-semibold rounded-lg border transition-all uppercase tracking-widest group
-                                ${isFinished ? 'bg-gray-800 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 text-white border-transparent' : 'bg-gray-50 dark:bg-gray-800 text-gray-300 border-gray-100 dark:border-gray-700 cursor-not-allowed'}`}
+                                ${isFinished
+                                    ? 'bg-gray-800 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 text-white border-transparent'
+                                    : 'bg-gray-50 dark:bg-gray-800 text-gray-300 border-gray-100 dark:border-gray-700 cursor-not-allowed'
+                                }`}
                         >
                             {info.row.original.status === 'running' ? 'Extrayendo...' : 'Ver Resultados'}
                             <ArrowRight size={13} className={isFinished ? 'group-hover:translate-x-0.5 transition-transform' : ''} />
                         </button>
                     </div>
                 );
-            }
-        })
-    ], []);
+            },
+        }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    ], [maxLeadsPerSearch]);
 
     const table = useReactTable({
         data, columns, pageCount,
@@ -144,10 +310,14 @@ const Executions = () => {
         manualPagination: true,
     });
 
+    /* ── render ───────────────────────────────────────────────────────────── */
+
     return (
         <>
             <PageMeta title="Historial de Búsquedas | Places Hub" description="Registro detallado de tus búsquedas de lugares en el mapa" />
             <div className="space-y-6">
+
+                {/* Header */}
                 <div className="flex flex-col space-y-2">
                     <h1 className="text-3xl font-bold text-gray-800 dark:text-white/90 tracking-tight flex items-center gap-3">
                         Historial de Búsquedas
@@ -157,18 +327,24 @@ const Executions = () => {
                             </span>
                         )}
                     </h1>
-                    <p className="text-gray-400 dark:text-gray-500 text-sm border-l-4 border-brand-500 pl-3">Registro detallado de tus búsquedas de lugares en el mapa</p>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm border-l-4 border-brand-500 pl-3">
+                        Registro detallado de tus búsquedas de lugares en el mapa
+                    </p>
                 </div>
 
+                {/* Monthly usage banner */}
+                <UsageBanner usage={monthlyUsage} />
+
+                {/* Table */}
                 <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                {table.getHeaderGroups().map(headerGroup => (
-                                    <tr key={headerGroup.id} className="bg-gray-50 dark:bg-gray-900/40 border-b border-gray-200 dark:border-gray-700">
-                                        {headerGroup.headers.map(header => (
-                                            <th key={header.id} className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                {table.getHeaderGroups().map(hg => (
+                                    <tr key={hg.id} className="bg-gray-50 dark:bg-gray-900/40 border-b border-gray-200 dark:border-gray-700">
+                                        {hg.headers.map(h => (
+                                            <th key={h.id} className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                                                {flexRender(h.column.columnDef.header, h.getContext())}
                                             </th>
                                         ))}
                                     </tr>
@@ -178,7 +354,7 @@ const Executions = () => {
                                 {loading ? (
                                     Array.from({ length: 5 }).map((_, i) => (
                                         <tr key={i} className="animate-pulse">
-                                            <td colSpan={4} className="px-6 py-5 h-20">
+                                            <td colSpan={5} className="px-6 py-5 h-20">
                                                 <div className="h-full bg-gray-100 dark:bg-gray-700 rounded-xl" />
                                             </td>
                                         </tr>
@@ -198,16 +374,17 @@ const Executions = () => {
                         </table>
                     </div>
 
+                    {/* Pagination */}
                     <div className="flex items-center justify-between px-6 py-4 bg-gray-50 dark:bg-gray-900/40 border-t border-gray-100 dark:border-gray-700">
                         <span className="text-gray-400 text-xs font-semibold hidden md:block px-4 py-2 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
-                            <span className="text-gray-700 dark:text-white/90">{pageIndex + 1}</span> / {pageCount}
+                            <span className="text-gray-700 dark:text-white/90">{pageIndex + 1}</span> / {pageCount || 1}
                         </span>
                         <div className="flex items-center gap-1.5">
                             {[
-                                { icon: <ChevronFirst size={16} />, onClick: () => table.setPageIndex(0), disabled: !table.getCanPreviousPage() },
-                                { icon: <ChevronLeft size={16} />, onClick: () => table.previousPage(), disabled: !table.getCanPreviousPage() },
-                                { icon: <ChevronRight size={16} />, onClick: () => table.nextPage(), disabled: !table.getCanNextPage() },
-                                { icon: <ChevronLast size={16} />, onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() },
+                                { icon: <ChevronFirst size={16} />, onClick: () => table.setPageIndex(0),                    disabled: !table.getCanPreviousPage() },
+                                { icon: <ChevronLeft  size={16} />, onClick: () => table.previousPage(),                    disabled: !table.getCanPreviousPage() },
+                                { icon: <ChevronRight size={16} />, onClick: () => table.nextPage(),                        disabled: !table.getCanNextPage()     },
+                                { icon: <ChevronLast  size={16} />, onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() },
                             ].map((btn, i) => (
                                 <button key={i}
                                     className="p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-brand-50 dark:hover:bg-brand-500/10 hover:text-brand-500 text-gray-400 disabled:opacity-20 transition-all"

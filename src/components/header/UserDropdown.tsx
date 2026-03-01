@@ -29,10 +29,10 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="mr-3 flex items-center justify-center bg-brand-500 text-white rounded-full h-11 w-11 font-bold text-sm uppercase">
-          {user?.username?.[0] || user?.name?.[0] || "U"}
+          {user?.first_name?.[0] || user?.email?.[0] || "U"}
         </span>
         <span className="block mr-1 font-medium text-theme-sm">
-          {user?.username || user?.name || "Usuario"}
+          {user ? `${user.first_name} ${user.last_name}` : "Usuario"}
         </span>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
@@ -60,7 +60,7 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user?.username || user?.name || "Usuario"}
+            {user ? `${user.first_name} ${user.last_name}` : "Usuario"}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
             Places Hub
@@ -72,7 +72,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/"
+              to="/profile"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <svg className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

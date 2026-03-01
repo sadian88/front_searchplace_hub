@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
-import { GridIcon, ListIcon, TableIcon, HorizontaLDots } from "../icons";
+import { GridIcon, ListIcon, TableIcon, HorizontaLDots, UserCircleIcon } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
 
@@ -15,7 +15,7 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    path: "/",
+    path: "/dashboard",
   },
   {
     icon: <TableIcon />,
@@ -31,6 +31,11 @@ const navItems: NavItem[] = [
     icon: <HorizontaLDots />,
     name: "Historial",
     path: "/executions",
+  },
+  {
+    icon: <UserCircleIcon />,
+    name: "Perfil",
+    path: "/profile",
   },
 ];
 
@@ -227,7 +232,7 @@ const AppSidebar: React.FC = () => {
         className={`py-6 flex items-center gap-3 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
           }`}
       >
-        <Link to="/" className="flex items-center gap-3">
+        <Link to="/dashboard" className="flex items-center gap-3">
           <img
             src="/images/logo/placeshub.png"
             alt="Logo"

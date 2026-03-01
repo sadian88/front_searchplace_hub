@@ -9,13 +9,16 @@ import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 
+// Public Pages
+import Landing from "./pages/Landing/Landing";
+
 // App Pages
 import Home from "./pages/Dashboard/Home";
 import Leads from "./pages/Leads/Leads";
 import SearchForm from "./pages/SearchForm/SearchForm";
 import Executions from "./pages/Executions/Executions";
-import ExecutionDetails from "./pages/ExecutionDetails/ExecutionDetails";
 import PlaceDetail from "./pages/PlaceDetail/PlaceDetail";
+import Profile from "./pages/Profile/Profile";
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -35,6 +38,9 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <Routes>
+          {/* Public landing page */}
+          <Route path="/" element={<Landing />} />
+
           {/* Protected Routes */}
           <Route
             element={
@@ -43,12 +49,12 @@ export default function App() {
               </PrivateRoute>
             }
           >
-            <Route index path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Home />} />
             <Route path="/leads" element={<Leads />} />
             <Route path="/buscador" element={<SearchForm />} />
             <Route path="/executions" element={<Executions />} />
-            <Route path="/executions/:id" element={<ExecutionDetails />} />
             <Route path="/places/:id" element={<PlaceDetail />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
 
           {/* Auth Routes */}
