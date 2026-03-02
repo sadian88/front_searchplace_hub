@@ -1,22 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../api/api";
 import {
   MapPin,
   Target,
   BarChart3,
-  Download,
   CheckCircle,
   ArrowRight,
   Menu,
   X,
-  Mail,
-  Phone,
   Zap,
   Users,
   Globe,
   Star,
+  ChevronDown,
 } from "lucide-react";
 
 // ─── Navbar ─────────────────────────────────────────────────────────────────
@@ -42,7 +39,7 @@ function Navbar() {
     { label: "Inicio", id: "inicio" },
     { label: "Ventajas", id: "ventajas" },
     { label: "Planes", id: "planes" },
-    { label: "Contáctenos", id: "contactenos" },
+    { label: "FAQ", id: "faq" },
   ];
 
   return (
@@ -284,15 +281,6 @@ const features = [
     border: "border-purple-100 dark:border-purple-500/20",
   },
   {
-    icon: <Zap size={24} />,
-    title: "Scraping automatizado",
-    description:
-      "Nuestro motor extrae datos en tiempo real usando Apify, sin necesidad de configuración técnica por tu parte.",
-    color: "text-orange-500",
-    bg: "bg-orange-50 dark:bg-orange-500/10",
-    border: "border-orange-100 dark:border-orange-500/20",
-  },
-  {
     icon: <Users size={24} />,
     title: "Gestión de leads",
     description:
@@ -333,9 +321,9 @@ function VentajasSection() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
             Todo lo que necesitas para prospección B2B
           </h2>
-          <p className="max-w-xl mx-auto text-gray-500 dark:text-gray-400 text-lg">
-            Desde la búsqueda hasta el cierre, PlacesHub cubre cada etapa de tu
-            proceso comercial.
+          <p className="max-w-2xl mx-auto text-gray-500 dark:text-gray-400 text-lg">
+            Buscar contactos de Google Maps nunca fue tan fácil, si necesitas
+            acceder a Negocios, su ubicación y sus Datos, PlaceHub es para ti.
           </p>
         </div>
 
@@ -387,6 +375,7 @@ const plans: Plan[] = [
     description: "Perfecto para explorar la plataforma y hacer pruebas.",
     features: [
       "5 leads por búsqueda",
+      "10 leads mensuales",
       "1 búsqueda simultánea",
       "Gestión básica de leads",
       "Dashboard con métricas",
@@ -397,16 +386,33 @@ const plans: Plan[] = [
     highlight: false,
   },
   {
-    name: "Standard",
+    name: "Basic",
+    price: "$29",
+    period: "por mes",
+    description: "Para profesionales que comienzan a generar leads.",
+    features: [
+      "20 leads por búsqueda",
+      "100 leads mensuales",
+      "2 búsquedas simultáneas",
+      "Gestión de leads",
+      "Dashboard con métricas",
+      "Soporte por email",
+    ],
+    cta: "Empezar ahora",
+    ctaLink: "/signup",
+    highlight: false,
+  },
+  {
+    name: "Medium",
     price: "$49",
     period: "por mes",
     description: "Para equipos de ventas que necesitan resultados consistentes.",
     features: [
-      "500 leads por búsqueda",
-      "5 búsquedas simultáneas",
+      "50 leads por búsqueda",
+      "400 leads mensuales",
+      "3 búsquedas simultáneas",
       "Exportación CSV",
       "Gestión avanzada de leads",
-      "Dashboard con métricas",
       "Soporte prioritario",
     ],
     cta: "Empezar ahora",
@@ -416,20 +422,19 @@ const plans: Plan[] = [
   },
   {
     name: "Pro",
-    price: "$129",
+    price: "$149",
     period: "por mes",
     description: "Para agencias y equipos comerciales de alto volumen.",
     features: [
-      "Leads ilimitados",
+      "100 leads por búsqueda",
+      "4,000 leads mensuales",
       "Búsquedas simultáneas ilimitadas",
       "Exportación CSV y API",
       "Gestión avanzada de leads",
-      "Dashboard personalizado",
       "Account manager dedicado",
-      "SLA garantizado",
     ],
     cta: "Contactar ventas",
-    ctaLink: "#contactenos",
+    ctaLink: "#faq",
     highlight: false,
   },
 ];
@@ -453,7 +458,7 @@ function PlanesSection() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -565,195 +570,78 @@ function PlanesSection() {
   );
 }
 
-// ─── Contáctenos ─────────────────────────────────────────────────────────────
+// ─── FAQ ─────────────────────────────────────────────────────────────────────
 
-function ContactSection() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+const faqs = [
+  {
+    q: "¿Qué tipo de negocios/leads vas a encontrar?",
+    a: "PlaceHub descubre negocios locales verificados en Google de acuerdo a tus criterios de búsqueda.",
+  },
+  {
+    q: "¿Qué información de contacto vas a obtener con PlaceHub?",
+    a: "PlaceHub te entregará información relevante de los negocios locales, tales como, teléfonos, correos, sitios web, perfiles de redes sociales y otros datos importantes para que puedas activar tu estrategia de contacto en frío.",
+  },
+  {
+    q: "¿En qué ubicaciones puedo encontrar negocios/leads?",
+    a: "Busca negocios en cualquier ciudad o país. Si está en Google Maps, PlacesHub puede encontrarlo.",
+  },
+  {
+    q: "¿Cómo funciona el consumo de créditos de mi plan?",
+    a: "El consumo del plan está basado en el número de búsquedas y leads verificados que necesites, cada plan te brinda créditos para descubrir nuevos negocios locales.",
+  },
+  {
+    q: "¿Cómo puedo adquirir más créditos?",
+    a: "Dentro de la plataforma puedes realizar el upgrade al siguiente plan de manera automática pagando en línea.",
+  },
+];
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    if (error) setError("");
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      await api.post("/contact", {
-        name: form.name.trim(),
-        email: form.email.trim(),
-        message: form.message.trim(),
-      });
-      setSent(true);
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message || "Error al enviar el mensaje. Intenta de nuevo."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+function FAQSection() {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   return (
-    <section id="contactenos" className="py-24 bg-white dark:bg-gray-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Info column */}
-          <div>
-            <span className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-semibold uppercase tracking-wider">
-              Contáctenos
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
-              ¿Preguntas? Estamos para ayudarte
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-lg mb-10 leading-relaxed">
-              Cuéntanos sobre tu equipo y tus necesidades. Te responderemos en
-              menos de 24 horas hábiles.
-            </p>
+    <section id="faq" className="py-24 bg-white dark:bg-gray-950">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-14">
+          <span className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-semibold uppercase tracking-wider">
+            FAQ
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
+            Preguntas frecuentes
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 text-lg">
+            Todo lo que necesitas saber antes de empezar.
+          </p>
+        </div>
 
-            <div className="space-y-5">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-xl">
-                  <Mail size={20} className="text-brand-600 dark:text-brand-400" />
+        {/* Accordion */}
+        <div className="space-y-3">
+          {faqs.map((faq, i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm"
+            >
+              <button
+                onClick={() => setOpenIdx(openIdx === i ? null : i)}
+                className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
+              >
+                <span className="text-sm font-semibold text-gray-800 dark:text-white leading-snug">
+                  {faq.q}
+                </span>
+                <ChevronDown
+                  size={18}
+                  className={`shrink-0 text-brand-500 transition-transform duration-300 ${
+                    openIdx === i ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              {openIdx === i && (
+                <div className="px-6 pb-5 text-sm text-gray-500 dark:text-gray-400 leading-relaxed border-t border-gray-100 dark:border-gray-700 pt-4">
+                  {faq.a}
                 </div>
-                <div>
-                  <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-0.5">
-                    Email
-                  </div>
-                  <a
-                    href="mailto:hola@hubcapture.com"
-                    className="text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
-                  >
-                    hola@hubcapture.com
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-xl">
-                  <Phone size={20} className="text-brand-600 dark:text-brand-400" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-0.5">
-                    WhatsApp
-                  </div>
-                  <a
-                    href="https://wa.me/1234567890"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
-                  >
-                    +1 (234) 567-890
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-xl">
-                  <Download size={20} className="text-brand-600 dark:text-brand-400" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-0.5">
-                    Demo gratuita
-                  </div>
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                    Solicita una demo personalizada
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
-          </div>
-
-          {/* Form column */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-8">
-            {sent ? (
-              <div className="h-full flex flex-col items-center justify-center text-center py-8 gap-4">
-                <div className="p-4 bg-brand-50 dark:bg-brand-500/10 rounded-full">
-                  <CheckCircle size={32} className="text-brand-600 dark:text-brand-400" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-800 dark:text-white">
-                  ¡Mensaje enviado!
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Te responderemos en menos de 24 horas hábiles.
-                </p>
-                <button
-                  onClick={() => { setSent(false); setForm({ name: "", email: "", message: "" }); }}
-                  className="mt-2 text-sm text-brand-600 dark:text-brand-400 font-medium hover:underline"
-                >
-                  Enviar otro mensaje
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="Tu nombre completo"
-                    className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="tu@empresa.com"
-                    className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
-                    Mensaje
-                  </label>
-                  <textarea
-                    name="message"
-                    required
-                    rows={5}
-                    value={form.message}
-                    onChange={handleChange}
-                    placeholder="Cuéntanos sobre tu proyecto o consulta..."
-                    className="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none"
-                  />
-                </div>
-
-                {error && (
-                  <div className="px-4 py-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-brand-600/25 flex items-center justify-center gap-2"
-                >
-                  {loading ? "Enviando..." : "Enviar mensaje"}
-                  {!loading && <ArrowRight size={16} />}
-                </button>
-              </form>
-            )}
-          </div>
+          ))}
         </div>
       </div>
     </section>
@@ -800,7 +688,7 @@ function Footer() {
                 { label: "Inicio", id: "inicio" },
                 { label: "Ventajas", id: "ventajas" },
                 { label: "Planes", id: "planes" },
-                { label: "Contáctenos", id: "contactenos" },
+                { label: "FAQ", id: "faq" },
               ].map((item) => (
                 <li key={item.id}>
                   <button
@@ -874,7 +762,7 @@ export default function Landing() {
         <HeroSection />
         <VentajasSection />
         <PlanesSection />
-        <ContactSection />
+        <FAQSection />
       </main>
       <Footer />
     </div>
