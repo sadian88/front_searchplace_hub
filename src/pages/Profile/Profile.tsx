@@ -8,10 +8,11 @@ import {
   CheckCircle,
   Shield,
   Zap,
-  Download,
   Code2,
   Headphones,
   TrendingUp,
+  ArrowUpCircle,
+  Loader2,
 } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useAuth } from "../../context/AuthContext";
@@ -277,9 +278,34 @@ function BasicDataCard() {
 
 /* ── sección plan actual ─────────────────────────────────────────────────── */
 
+interface Plan {
+  id: number;
+  name: string;
+  display_name: string;
+  price_monthly: number;
+}
+
 function PlanCard() {
   const { user } = useAuth();
   const plan = user?.plan;
+  const [availablePlans, setAvailablePlans] = useState<Plan[]>([]);
+  const [upgradingTo, setUpgradingTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.get<Plan[]>('/plans').then(({ data }) => setAvailablePlans(data)).catch(() => {});
+  }, []);
+
+  const handleUpgrade = async (planName: string) => {
+    setUpgradingTo(planName);
+    try {
+      const { data } = await api.post<{ init_point: string }>('/payments/create-preference', { planName });
+      window.location.href = data.init_point;
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Error al iniciar el pago.';
+      alert(msg);
+      setUpgradingTo(null);
+    }
+  };
 
   if (!plan) return null;
 
@@ -374,25 +400,43 @@ function PlanCard() {
         </div>
       </div>
 
-      {/* CTA upgrade (solo si no es pro) */}
-      {plan.name !== "pro" && (
-        <div className="px-6 pb-6">
-          <div className="p-4 bg-gradient-to-r from-brand-50 to-brand-100/50 dark:from-brand-500/10 dark:to-brand-500/5 rounded-xl border border-brand-100 dark:border-brand-500/20">
-            <p className="text-xs font-semibold text-brand-700 dark:text-brand-300 mb-2">
-              {plan.name === "free"
-                ? "Pasa al plan Standard y obtén hasta 500 leads por búsqueda."
-                : "Pasa al plan Pro y obtén búsquedas y leads ilimitados."}
+      {/* CTA upgrade — planes superiores al actual */}
+      {(() => {
+        const upgradeable = availablePlans.filter(
+          (p) => p.price_monthly > (plan.price_monthly ?? 0)
+        );
+        if (upgradeable.length === 0) return null;
+        return (
+          <div className="px-6 pb-6 space-y-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+              Actualizar plan
             </p>
-            <a
-              href="#contactenos"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline"
-            >
-              Contactar ventas
-              <Download size={11} />
-            </a>
+            {upgradeable.map((p) => (
+              <button
+                key={p.name}
+                onClick={() => handleUpgrade(p.name)}
+                disabled={upgradingTo !== null}
+                className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-brand-50 to-brand-100/50 dark:from-brand-500/10 dark:to-brand-500/5 border border-brand-100 dark:border-brand-500/20 rounded-xl hover:from-brand-100 hover:to-brand-200/50 dark:hover:from-brand-500/20 dark:hover:to-brand-500/10 disabled:opacity-60 transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <ArrowUpCircle size={16} className="text-brand-600 dark:text-brand-400" />
+                  <span className="text-sm font-bold text-brand-700 dark:text-brand-300">
+                    Actualizar a {p.display_name}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-extrabold text-brand-600 dark:text-brand-400">
+                    ${p.price_monthly}/mes
+                  </span>
+                  {upgradingTo === p.name && (
+                    <Loader2 size={14} className="animate-spin text-brand-500" />
+                  )}
+                </div>
+              </button>
+            ))}
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

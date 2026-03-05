@@ -19,6 +19,9 @@ import SearchForm from "./pages/SearchForm/SearchForm";
 import Executions from "./pages/Executions/Executions";
 import PlaceDetail from "./pages/PlaceDetail/PlaceDetail";
 import Profile from "./pages/Profile/Profile";
+import PaymentSuccess from "./pages/Payment/PaymentSuccess";
+import PaymentPending from "./pages/Payment/PaymentPending";
+import PaymentFailure from "./pages/Payment/PaymentFailure";
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -56,6 +59,11 @@ export default function App() {
             <Route path="/places/:id" element={<PlaceDetail />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
+
+          {/* Payment Routes (public — MP redirects here after checkout) */}
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/pending" element={<PaymentPending />} />
+          <Route path="/payment/failure" element={<PaymentFailure />} />
 
           {/* Auth Routes */}
           <Route path="/signin" element={<SignIn />} />

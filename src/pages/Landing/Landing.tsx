@@ -15,6 +15,7 @@ import {
   Star,
   ChevronDown,
 } from "lucide-react";
+import { MercadoPagoIcon, SecurePaymentBadge } from "../../components/common/MercadoPagoBadge";
 
 // ─── Navbar ─────────────────────────────────────────────────────────────────
 
@@ -399,7 +400,7 @@ const plans: Plan[] = [
       "Soporte por email",
     ],
     cta: "Empezar ahora",
-    ctaLink: "/signup",
+    ctaLink: "/signup?plan=basic",
     highlight: false,
   },
   {
@@ -416,7 +417,7 @@ const plans: Plan[] = [
       "Soporte prioritario",
     ],
     cta: "Empezar ahora",
-    ctaLink: "/signup",
+    ctaLink: "/signup?plan=medium",
     highlight: true,
     badge: "Más popular",
   },
@@ -458,7 +459,7 @@ function PlanesSection() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch mb-8">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -553,17 +554,34 @@ function PlanesSection() {
               ) : (
                 <Link
                   to={plan.ctaLink}
-                  className={`block w-full py-3 rounded-xl font-semibold text-sm text-center transition-all duration-200 ${
+                  className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm text-center transition-all duration-200 ${
                     plan.highlight
                       ? "bg-white text-brand-700 hover:bg-brand-50"
                       : "bg-brand-600 text-white hover:bg-brand-700"
                   }`}
                 >
+                  {plan.ctaLink.includes("?plan=") && (
+                    <MercadoPagoIcon size={18} />
+                  )}
                   {plan.cta}
                 </Link>
               )}
+
+              {/* Indicador de pago seguro en planes pagos */}
+              {plan.ctaLink.includes("?plan=") && (
+                <p className={`mt-2 text-center text-[11px] font-medium ${
+                  plan.highlight ? "text-brand-100/70" : "text-gray-400 dark:text-gray-500"
+                }`}>
+                  Pago seguro con MercadoPago
+                </p>
+              )}
             </div>
           ))}
+        </div>
+
+        {/* Badge de pago seguro global */}
+        <div className="max-w-sm mx-auto">
+          <SecurePaymentBadge />
         </div>
       </div>
     </section>

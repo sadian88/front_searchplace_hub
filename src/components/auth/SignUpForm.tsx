@@ -1,11 +1,18 @@
 import { useState, useRef } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
+import { MercadoPagoIcon, SecurePaymentBadge } from "../common/MercadoPagoBadge";
+
+const PLAN_LABELS: Record<string, { label: string; price: string; description: string }> = {
+  basic:  { label: "Basic",  price: "$29/mes", description: "20 leads por búsqueda · 100 leads mensuales" },
+  medium: { label: "Medium", price: "$49/mes", description: "50 leads por búsqueda · 400 leads mensuales" },
+  pro:    { label: "Pro",    price: "$149/mes", description: "100 leads por búsqueda · 4,000 leads mensuales" },
+};
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +32,9 @@ export default function SignUpForm() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const selectedPlan = searchParams.get("plan")?.toLowerCase() ?? null;
+  const planInfo = selectedPlan ? PLAN_LABELS[selectedPlan] : null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -80,6 +90,20 @@ export default function SignUpForm() {
         password: form.password,
       });
       await login(response.data.token);
+
+      // If a paid plan was pre-selected, create the MP preference and redirect
+      if (selectedPlan && PLAN_LABELS[selectedPlan]) {
+        try {
+          const prefRes = await api.post<{ init_point: string }>("/payments/create-preference", {
+            planName: selectedPlan,
+          });
+          window.location.href = prefRes.data.init_point;
+          return;
+        } catch {
+          // Payment preference failed — land in dashboard and let user retry from Profile
+        }
+      }
+
       navigate("/dashboard");
     } catch (err: any) {
       const msg: string =
@@ -107,7 +131,9 @@ export default function SignUpForm() {
             Crear cuenta
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Empieza gratis. Sin tarjeta de crédito.
+            {planInfo
+              ? `Registro para el plan ${planInfo.label}. Completa tus datos y continúa al pago.`
+              : "Empieza gratis. Sin tarjeta de crédito."}
           </p>
         </div>
 
@@ -216,14 +242,30 @@ export default function SignUpForm() {
             )}
 
             {/* Plan badge informativo */}
-            <div className="flex items-center gap-2 px-4 py-3 bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-lg">
-              <span className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">
-                Plan Free
-              </span>
-              <span className="text-xs text-brand-700 dark:text-brand-300">
-                · 5 leads por búsqueda · Sin tarjeta de crédito
-              </span>
-            </div>
+            {planInfo ? (
+              <div className="px-4 py-3 bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-lg space-y-0.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">
+                    Plan {planInfo.label}
+                  </span>
+                  <span className="text-xs font-bold text-brand-700 dark:text-brand-300">
+                    {planInfo.price}
+                  </span>
+                </div>
+                <p className="text-xs text-brand-600/70 dark:text-brand-400/70">
+                  {planInfo.description} · Pagarás luego del registro
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-3 bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-lg">
+                <span className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">
+                  Plan Free
+                </span>
+                <span className="text-xs text-brand-700 dark:text-brand-300">
+                  · 5 leads por búsqueda · Sin tarjeta de crédito
+                </span>
+              </div>
+            )}
 
             {/* Submit */}
             <Button
@@ -231,8 +273,20 @@ export default function SignUpForm() {
               size="sm"
               disabled={loading || emailHasError || emailChecking}
             >
-              {loading ? "Creando cuenta..." : "Crear cuenta gratis"}
+              {planInfo && !loading && (
+                <span className="mr-2 inline-flex shrink-0">
+                  <MercadoPagoIcon size={18} />
+                </span>
+              )}
+              {loading
+                ? "Creando cuenta..."
+                : planInfo
+                  ? "Crear cuenta y continuar al pago"
+                  : "Crear cuenta gratis"}
             </Button>
+
+            {/* Badge de seguridad — solo visible cuando hay plan de pago */}
+            {planInfo && <SecurePaymentBadge />}
           </div>
         </form>
 
