@@ -2,11 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import api from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
-import {
-    Play, MapPin, Search, Filter, Loader2, Target,
-    CheckCircle, Globe, Circle as CircleIcon, Hexagon,
-    Users, AlertTriangle, Zap, Lock,
-} from 'lucide-react';
+import { FiPlay, FiMapPin, FiSearch, FiFilter, FiCrosshair, FiCheckCircle, FiGlobe, FiCircle, FiOctagon, FiUsers, FiAlertTriangle, FiZap, FiLock } from "react-icons/fi";
 import MapSelector from '../../components/map/MapSelector';
 import PageMeta from '../../components/common/PageMeta';
 
@@ -172,7 +168,7 @@ const SearchForm = () => {
                 {/* Blocked banners */}
                 {isAtConcurrentLimit && (
                     <div className="mb-6 flex items-start gap-3 p-4 bg-error-50 dark:bg-error-500/10 border border-error-200 dark:border-error-500/20 rounded-2xl">
-                        <AlertTriangle size={18} className="text-error-500 mt-0.5 shrink-0" />
+                        <FiAlertTriangle size={18} className="text-error-500 mt-0.5 shrink-0" />
                         <div>
                             <p className="text-sm font-bold text-error-700 dark:text-error-300">Límite de búsquedas simultáneas alcanzado</p>
                             <p className="text-xs text-error-600 dark:text-error-400 mt-0.5">
@@ -183,7 +179,7 @@ const SearchForm = () => {
                 )}
                 {isAtMonthlyLimit && !isAtConcurrentLimit && (
                     <div className="mb-6 flex items-start gap-3 p-4 bg-error-50 dark:bg-error-500/10 border border-error-200 dark:border-error-500/20 rounded-2xl">
-                        <AlertTriangle size={18} className="text-error-500 mt-0.5 shrink-0" />
+                        <FiAlertTriangle size={18} className="text-error-500 mt-0.5 shrink-0" />
                         <div>
                             <p className="text-sm font-bold text-error-700 dark:text-error-300">Límite mensual de leads alcanzado</p>
                             <p className="text-xs text-error-600 dark:text-error-400 mt-0.5">
@@ -199,7 +195,7 @@ const SearchForm = () => {
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 space-y-6 shadow-sm">
                             <div className="space-y-5">
                                 <h3 className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                                    <Search size={12} className="text-brand-500" /> Parámetros Base
+                                    <FiSearch size={12} className="text-brand-500" /> Parámetros Base
                                 </h3>
 
                                 {/* Category */}
@@ -208,7 +204,7 @@ const SearchForm = () => {
                                         Término de Búsqueda
                                     </label>
                                     <div className="relative">
-                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600" size={14} />
+                                        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600" size={14} />
                                         <select
                                             name="search_term"
                                             value={formData.search_term}
@@ -220,7 +216,7 @@ const SearchForm = () => {
                                             {categories.map((cat, i) => <option key={i} value={cat}>{cat}</option>)}
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300">
-                                            <Filter size={12} />
+                                            <FiFilter size={12} />
                                         </div>
                                     </div>
                                 </div>
@@ -231,7 +227,7 @@ const SearchForm = () => {
                                         Referencia Textual (Auto)
                                     </label>
                                     <div className="relative">
-                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600" size={14} />
+                                        <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600" size={14} />
                                         <input
                                             name="location"
                                             value={formData.location}
@@ -261,7 +257,7 @@ const SearchForm = () => {
                                     {/* Value badge */}
                                     <div className="flex items-center justify-center py-2">
                                         <div className="flex items-center gap-2 px-5 py-2.5 bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-xl">
-                                            <Users size={15} className="text-brand-500" />
+                                            <FiUsers size={15} className="text-brand-500" />
                                             <span className="text-2xl font-extrabold text-gray-800 dark:text-white tabular-nums leading-none">
                                                 {formData.max_leads}
                                             </span>
@@ -291,7 +287,7 @@ const SearchForm = () => {
                             {/* Filters */}
                             <div className="space-y-4">
                                 <h3 className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                                    <Filter size={12} className="text-purple-500" /> Filtros Adicionales
+                                    <FiFilter size={12} className="text-purple-500" /> Filtros Adicionales
                                 </h3>
                                 <label className="flex items-center gap-3 p-4 bg-brand-50 dark:bg-brand-500/10 rounded-xl border border-brand-200 dark:border-brand-500/20 cursor-pointer hover:bg-brand-100 dark:hover:bg-brand-500/20 transition-all">
                                     <input
@@ -302,7 +298,7 @@ const SearchForm = () => {
                                         className="w-4 h-4 rounded accent-brand-500 cursor-pointer"
                                     />
                                     <span className="text-[10px] font-bold text-gray-700 dark:text-white/90 uppercase tracking-widest flex items-center gap-2">
-                                        <Globe size={13} className="text-brand-500" /> Exigir Sitio Web
+                                        <FiGlobe size={13} className="text-brand-500" /> Exigir Sitio Web
                                     </span>
                                 </label>
                             </div>
@@ -312,12 +308,12 @@ const SearchForm = () => {
                             {/* Plan status bar */}
                             <div className="space-y-2">
                                 <h3 className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                                    <Zap size={12} className="text-brand-500" /> Estado del Plan
+                                    <FiZap size={12} className="text-brand-500" /> Estado del Plan
                                 </h3>
                                 <div className="grid grid-cols-2 gap-2">
                                     {/* Leads chip */}
                                     <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-700 rounded-xl">
-                                        <Users size={12} className="text-brand-500 shrink-0" />
+                                        <FiUsers size={12} className="text-brand-500 shrink-0" />
                                         <div className="min-w-0">
                                             <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Leads / búsq.</p>
                                             <p className="text-xs font-extrabold text-gray-700 dark:text-white/80 truncate">
@@ -329,7 +325,7 @@ const SearchForm = () => {
                                     <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-colors ${concurrentColors[concurrentStatus]}`}>
                                         {concurrentStatus === 'limit'
                                             ? <Lock size={12} className="shrink-0" />
-                                            : <Zap size={12} className="shrink-0" />
+                                            : <FiZap size={12} className="shrink-0" />
                                         }
                                         <div className="min-w-0">
                                             <p className="text-[9px] font-bold uppercase tracking-wider opacity-70">Simultáneas</p>
@@ -370,7 +366,7 @@ const SearchForm = () => {
                             {/* Error */}
                             {error && (
                                 <div className="flex items-start gap-2.5 px-4 py-3 bg-error-50 dark:bg-error-500/10 border border-error-200 dark:border-error-500/20 rounded-xl">
-                                    <AlertTriangle size={14} className="text-error-500 mt-0.5 shrink-0" />
+                                    <FiAlertTriangle size={14} className="text-error-500 mt-0.5 shrink-0" />
                                     <p className="text-xs text-error-700 dark:text-error-300 font-medium">{error}</p>
                                 </div>
                             )}
@@ -379,23 +375,24 @@ const SearchForm = () => {
                             <div className="pt-1">
                                 {success ? (
                                     <div className="bg-success-500 text-white p-4 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest shadow-lg shadow-success-500/30 animate-bounce">
-                                        <CheckCircle size={18} /> ¡Iniciado!
+                                        <FiCheckCircle size={18} /> ¡Iniciado!
                                     </div>
                                 ) : isBlocked ? (
                                     <div className="w-full bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 text-xs uppercase tracking-widest cursor-not-allowed border border-gray-200 dark:border-gray-600">
-                                        <Lock size={16} /> Búsqueda bloqueada
+                                        <FiLock size={16} /> Búsqueda bloqueada
                                     </div>
                                 ) : (
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-gray-800 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-3 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 text-xs uppercase tracking-widest shadow-lg active:scale-[0.98] group"
+                                        className="relative overflow-hidden w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed text-xs uppercase tracking-widest shadow-lg shadow-brand-600/25 active:scale-[0.98] group"
                                     >
                                         {loading
-                                            ? <Loader2 className="animate-spin text-brand-400" size={18} />
-                                            : <Play size={18} className="text-brand-500 group-hover:translate-x-0.5 transition-transform" />
+                                            ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            : <FiPlay size={16} className="group-hover:translate-x-0.5 transition-transform" />
                                         }
                                         Iniciar Búsqueda
+                                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
                                     </button>
                                 )}
                             </div>
@@ -408,7 +405,7 @@ const SearchForm = () => {
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="space-y-1">
                                     <h4 className="text-lg font-bold text-gray-800 dark:text-white/90 tracking-tight flex items-center gap-2">
-                                        <Target size={20} className="text-brand-500" /> Delimitación Geográfica
+                                        <FiCrosshair size={20} className="text-brand-500" /> Delimitación Geográfica
                                     </h4>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 ml-7">
                                         Define visualmente el alcance exacto de tu búsqueda.
@@ -416,8 +413,8 @@ const SearchForm = () => {
                                 </div>
                                 <div className="flex gap-1.5 p-1.5 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl">
                                     {[
-                                        { id: 'circle',  label: 'Círculo',  icon: <CircleIcon size={13} /> },
-                                        { id: 'polygon', label: 'Polígono', icon: <Hexagon size={13} /> },
+                                        { id: 'circle',  label: 'Círculo',  icon: <FiCircle size={13} /> },
+                                        { id: 'polygon', label: 'Polígono', icon: <FiOctagon size={13} /> },
                                     ].map(type => (
                                         <button
                                             key={type.id}

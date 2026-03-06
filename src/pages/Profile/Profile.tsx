@@ -1,19 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  User,
-  Mail,
-  Edit3,
-  Save,
-  X,
-  CheckCircle,
-  Shield,
-  Zap,
-  Code2,
-  Headphones,
-  TrendingUp,
-  ArrowUpCircle,
-  Loader2,
-} from "lucide-react";
+import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCheckCircle, FiShield, FiZap, FiCode, FiHeadphones, FiTrendingUp, FiArrowUpCircle } from "react-icons/fi";
 import PageMeta from "../../components/common/PageMeta";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
@@ -38,7 +24,7 @@ function PlanFeature({
             : "bg-gray-100 dark:bg-gray-700"
           }`}
       >
-        <CheckCircle
+        <FiCheckCircle
           size={12}
           className={active ? "text-brand-600 dark:text-brand-400" : "text-gray-400 dark:text-gray-500"}
         />
@@ -135,7 +121,7 @@ function BasicDataCard() {
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <User size={18} className="text-brand-600 dark:text-brand-400" />
+          <FiUser size={18} className="text-brand-600 dark:text-brand-400" />
           <h2 className="font-bold text-gray-800 dark:text-white text-sm">
             Datos básicos
           </h2>
@@ -145,7 +131,7 @@ function BasicDataCard() {
             onClick={() => setEditing(true)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-colors"
           >
-            <Edit3 size={13} />
+            <FiEdit2 size={13} />
             Editar
           </button>
         )}
@@ -153,7 +139,7 @@ function BasicDataCard() {
 
       {/* Avatar */}
       <div className="flex flex-col items-center pt-8 pb-6 px-6 border-b border-gray-100 dark:border-gray-700">
-        <div className="w-20 h-20 rounded-full bg-brand-600 flex items-center justify-center text-white text-2xl font-extrabold shadow-lg mb-3">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white text-2xl font-extrabold shadow-lg shadow-brand-500/30 mb-3">
           {initials}
         </div>
         {!editing && (
@@ -172,7 +158,7 @@ function BasicDataCard() {
       <div className="p-6">
         {success && (
           <div className="mb-4 flex items-center gap-2 px-4 py-3 bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20 rounded-lg text-sm text-brand-700 dark:text-brand-300">
-            <CheckCircle size={15} />
+            <FiCheckCircle size={15} />
             Perfil actualizado correctamente.
           </div>
         )}
@@ -239,7 +225,7 @@ function BasicDataCard() {
                 disabled={saving}
                 className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-colors"
               >
-                <Save size={14} />
+                <FiSave size={14} />
                 {saving ? "Guardando..." : "Guardar cambios"}
               </button>
               <button
@@ -248,7 +234,7 @@ function BasicDataCard() {
                 disabled={saving}
                 className="px-4 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
               >
-                <X size={14} />
+                <FiX size={14} />
               </button>
             </div>
           </form>
@@ -257,7 +243,7 @@ function BasicDataCard() {
             {[
               { label: "Nombre", value: user?.first_name },
               { label: "Apellido", value: user?.last_name },
-              { label: "Email", value: user?.email, icon: <Mail size={13} className="text-gray-400" /> },
+              { label: "Email", value: user?.email, icon: <FiMail size={13} className="text-gray-400" /> },
             ].map(({ label, value, icon }) => (
               <div key={label}>
                 <dt className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">
@@ -332,7 +318,7 @@ function PlanCard() {
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Shield size={18} className={colors.icon} />
+          <FiShield size={18} className={colors.icon} />
           <h2 className="font-bold text-gray-800 dark:text-white text-sm">
             Plan actual
           </h2>
@@ -361,7 +347,7 @@ function PlanCard() {
         <div className="grid grid-cols-2 gap-4">
           <div className="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-1.5 mb-1">
-              <TrendingUp size={13} className={colors.icon} />
+              <FiTrendingUp size={13} className={colors.icon} />
               <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Leads / búsqueda
               </span>
@@ -372,7 +358,7 @@ function PlanCard() {
           </div>
           <div className="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-1.5 mb-1">
-              <Zap size={13} className={colors.icon} />
+              <FiZap size={13} className={colors.icon} />
               <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Búsquedas simult.
               </span>
@@ -419,7 +405,7 @@ function PlanCard() {
                 className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-brand-50 to-brand-100/50 dark:from-brand-500/10 dark:to-brand-500/5 border border-brand-100 dark:border-brand-500/20 rounded-xl hover:from-brand-100 hover:to-brand-200/50 dark:hover:from-brand-500/20 dark:hover:to-brand-500/10 disabled:opacity-60 transition-all"
               >
                 <div className="flex items-center gap-2">
-                  <ArrowUpCircle size={16} className="text-brand-600 dark:text-brand-400" />
+                  <FiArrowUpCircle size={16} className="text-brand-600 dark:text-brand-400" />
                   <span className="text-sm font-bold text-brand-700 dark:text-brand-300">
                     Actualizar a {p.display_name}
                   </span>
@@ -429,7 +415,7 @@ function PlanCard() {
                     ${p.price_monthly}/mes
                   </span>
                   {upgradingTo === p.name && (
-                    <Loader2 size={14} className="animate-spin text-brand-500" />
+                    <span className="inline-block w-3.5 h-3.5 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
                   )}
                 </div>
               </button>
@@ -480,7 +466,7 @@ function UsageCard() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
-        <TrendingUp size={18} className="text-brand-600 dark:text-brand-400" />
+        <FiTrendingUp size={18} className="text-brand-600 dark:text-brand-400" />
         <h2 className="font-bold text-gray-800 dark:text-white text-sm">Uso del plan</h2>
         <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">— mes actual</span>
       </div>
@@ -608,11 +594,22 @@ export default function Profile() {
 
       <div className="space-y-6">
         {/* Hero */}
-        <div className="relative overflow-hidden bg-brand-600 rounded-2xl p-6 lg:p-8 shadow-lg border border-white/20">
-          <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-8 -left-8 w-36 h-36 bg-white/5 rounded-full" />
+        <div
+          className="relative overflow-hidden rounded-2xl p-6 lg:p-8 shadow-lg"
+          style={{ background: "linear-gradient(135deg, #030711 0%, #0c1428 50%, #030711 100%)" }}
+        >
+          {/* Dot grid */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.04]"
+            style={{ backgroundImage: "radial-gradient(circle, #94a3b8 1px, transparent 1px)", backgroundSize: "28px 28px" }}
+          />
+          {/* Glow orbs */}
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "rgba(37,99,235,0.18)" }} />
+          <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full blur-3xl" style={{ background: "rgba(124,58,237,0.10)" }} />
+          {/* Top accent line */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
           <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white text-2xl font-extrabold shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/30 to-brand-700/30 border border-brand-500/30 flex items-center justify-center text-white text-2xl font-extrabold shrink-0">
               {user
                 ? `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase() || "?"
                 : "?"}
@@ -623,9 +620,9 @@ export default function Profile() {
               </h1>
               <p className="text-white/70 text-sm mt-0.5">{user?.email}</p>
               <div className="flex flex-wrap gap-2 mt-3">
-                <StatChip icon={<Shield size={12} />} label={user?.plan.display_name ?? "Free"} />
-                <StatChip icon={<Code2 size={12} />} label={`ID: ${user?.id}`} />
-                <StatChip icon={<Headphones size={12} />} label={user?.plan.support_level === "dedicated" ? "Account manager" : user?.plan.support_level === "priority" ? "Soporte prioritario" : "Soporte email"} />
+                <StatChip icon={<FiShield size={12} />} label={user?.plan.display_name ?? "Free"} />
+                <StatChip icon={<FiCode size={12} />} label={`ID: ${user?.id}`} />
+                <StatChip icon={<FiHeadphones size={12} />} label={user?.plan.support_level === "dedicated" ? "Account manager" : user?.plan.support_level === "priority" ? "Soporte prioritario" : "Soporte email"} />
               </div>
             </div>
           </div>

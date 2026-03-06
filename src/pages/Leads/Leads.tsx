@@ -8,13 +8,7 @@ import {
     createColumnHelper,
     type PaginationState,
 } from '@tanstack/react-table';
-import {
-    Search, Star, Tag,
-    ChevronLeft, ChevronRight,
-    ChevronFirst, ChevronLast,
-    Globe, ExternalLink, MapPin,
-    Building2, ArrowLeft, CalendarDays,
-} from 'lucide-react';
+import { FiSearch, FiStar, FiTag, FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiGlobe, FiExternalLink, FiMapPin, FiHome, FiArrowLeft, FiCalendar } from "react-icons/fi";
 import PageMeta from '../../components/common/PageMeta';
 
 /* ── status helpers ───────────────────────────────────────────────────────── */
@@ -106,7 +100,7 @@ const Leads = () => {
                         />
                     ) : (
                         <div className="text-gray-300 dark:text-gray-600 group-hover:text-brand-400 transition-colors">
-                            <Building2 size={18} />
+                            <FiHome size={18} />
                         </div>
                     )}
                 </div>
@@ -123,7 +117,7 @@ const Leads = () => {
                         {info.getValue()}
                     </span>
                     <span className="text-[10px] font-semibold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-2 py-0.5 rounded-md border border-brand-200 dark:border-brand-500/20 uppercase tracking-wider flex items-center gap-1 w-fit mt-1">
-                        <Tag size={9} /> {info.row.original.category_name || 'GENERAL'}
+                        <FiTag size={9} /> {info.row.original.category_name || 'GENERAL'}
                     </span>
                 </div>
             ),
@@ -132,7 +126,7 @@ const Leads = () => {
             header: 'Score',
             cell: info => (
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-xl w-fit">
-                    <Star size={11} className="text-amber-400 fill-amber-400" />
+                    <FiStar size={11} className="text-amber-400 fill-amber-400" />
                     <span className="text-xs font-bold text-amber-700 dark:text-amber-400">{info.getValue() || '0.0'}</span>
                     {info.row.original.reviews_count != null && (
                         <span className="text-gray-400 text-[10px]">({info.row.original.reviews_count})</span>
@@ -175,13 +169,13 @@ const Leads = () => {
                     {info.row.original.website && (
                         <a href={info.row.original.website} target="_blank" rel="noreferrer" title="Website"
                             className="p-2 bg-white dark:bg-gray-800 hover:bg-brand-50 dark:hover:bg-brand-500/10 text-gray-400 hover:text-brand-500 rounded-lg transition-all border border-gray-200 dark:border-gray-700">
-                            <Globe size={14} />
+                            <FiGlobe size={14} />
                         </a>
                     )}
                     {info.row.original.maps_url && (
                         <a href={info.row.original.maps_url} target="_blank" rel="noreferrer" title="Google Maps"
                             className="p-2 bg-white dark:bg-gray-800 hover:bg-purple-50 dark:hover:bg-purple-500/10 text-gray-400 hover:text-purple-500 rounded-lg transition-all border border-gray-200 dark:border-gray-700">
-                            <MapPin size={14} />
+                            <FiMapPin size={14} />
                         </a>
                     )}
                     <button
@@ -189,7 +183,7 @@ const Leads = () => {
                         title="Ver detalle"
                         className="p-2 bg-white dark:bg-gray-800 hover:bg-gray-800 dark:hover:bg-gray-700 text-gray-400 hover:text-white rounded-lg transition-all border border-gray-200 dark:border-gray-700"
                     >
-                        <ExternalLink size={14} />
+                        <FiExternalLink size={14} />
                     </button>
                 </div>
             ),
@@ -239,7 +233,7 @@ const Leads = () => {
                             onClick={() => navigate('/executions')}
                             className="flex items-center gap-2 text-xs font-semibold text-gray-400 dark:text-gray-500 hover:text-brand-500 dark:hover:text-brand-400 border border-gray-200 dark:border-gray-700 px-5 py-2.5 rounded-xl w-fit uppercase tracking-widest transition-all bg-white dark:bg-gray-800 group"
                         >
-                            <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
+                            <FiArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
                             Volver al historial
                         </button>
 
@@ -257,7 +251,7 @@ const Leads = () => {
                                             {execution.location}
                                         </span>
                                         <span className="inline-flex items-center gap-1.5 text-[10px] bg-gray-50 dark:bg-gray-700 text-gray-400 border border-gray-100 dark:border-gray-600 px-4 py-1.5 rounded-lg font-bold uppercase tracking-widest">
-                                            <CalendarDays size={10} />
+                                            <FiCalendar size={10} />
                                             {new Date(execution.created_at).toLocaleDateString()}
                                         </span>
                                     </div>
@@ -283,7 +277,7 @@ const Leads = () => {
                         </div>
                         <div className="flex gap-3 w-full xl:w-auto">
                             <div className="relative flex-1 xl:w-80 group">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={15} />
+                                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={15} />
                                 <input
                                     type="text"
                                     placeholder="Buscar por nombre o categoría..."
@@ -361,7 +355,7 @@ const Leads = () => {
                                     onClick={() => table.setPageIndex(0)}
                                     disabled={!table.getCanPreviousPage()}
                                 >
-                                    <ChevronFirst size={16} />
+                                    <FiChevronsLeft size={16} />
                                 </button>
                             )}
                             <button
@@ -369,7 +363,7 @@ const Leads = () => {
                                 onClick={() => table.previousPage()}
                                 disabled={!table.getCanPreviousPage()}
                             >
-                                <ChevronLeft size={16} />
+                                <FiChevronLeft size={16} />
                             </button>
                             <span className="px-3 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
                                 {pageIndex + 1} / {pageCount || 1}
@@ -379,7 +373,7 @@ const Leads = () => {
                                 onClick={() => table.nextPage()}
                                 disabled={!table.getCanNextPage()}
                             >
-                                <ChevronRight size={16} />
+                                <FiChevronRight size={16} />
                             </button>
                             {!executionId && (
                                 <button
@@ -387,7 +381,7 @@ const Leads = () => {
                                     onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                                     disabled={!table.getCanNextPage()}
                                 >
-                                    <ChevronLast size={16} />
+                                    <FiChevronsRight size={16} />
                                 </button>
                             )}
                         </div>
@@ -398,7 +392,7 @@ const Leads = () => {
                 {filteredData.length === 0 && !loading && (
                     <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
                         <div className="p-6 bg-gray-100 dark:bg-gray-700 rounded-full w-fit mx-auto mb-5">
-                            <Search size={36} className="text-brand-500" />
+                            <FiSearch size={36} className="text-brand-500" />
                         </div>
                         <p className="text-gray-700 dark:text-white/90 text-sm font-bold mb-2">No hay leads disponibles</p>
                         <p className="text-gray-400 text-xs max-w-xs mx-auto">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import api from '../../api/api';
-import { Users, Activity, Target, ChevronRight, TrendingUp } from 'lucide-react';
+import { FiUsers, FiActivity, FiCrosshair, FiChevronRight, FiTrendingUp } from "react-icons/fi";
 import PageMeta from "../../components/common/PageMeta";
 import Chart from 'react-apexcharts';
 
@@ -43,9 +43,9 @@ export default function Home() {
   }, []);
 
   const statCards = [
-    { label: 'Leads Totales', value: stats.totalLeads, icon: <Users size={20} />, color: 'text-brand-600', bg: 'bg-brand-50 dark:bg-brand-500/10', border: 'border-brand-200 dark:border-brand-500/20' },
-    { label: 'Búsquedas', value: stats.totalExecutions, icon: <Activity size={20} />, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-500/10', border: 'border-purple-200 dark:border-purple-500/20' },
-    { label: 'En Proceso', value: stats.activeProcesses, icon: <Target size={20} />, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-500/10', border: 'border-orange-200 dark:border-orange-500/20' },
+    { label: 'Leads Totales', value: stats.totalLeads, icon: <FiUsers size={20} />, color: 'text-brand-600', bg: 'bg-brand-50 dark:bg-brand-500/10', border: 'border-brand-200 dark:border-brand-500/20' },
+    { label: 'Búsquedas', value: stats.totalExecutions, icon: <FiActivity size={20} />, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-500/10', border: 'border-purple-200 dark:border-purple-500/20' },
+    { label: 'En Proceso', value: stats.activeProcesses, icon: <FiCrosshair size={20} />, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-500/10', border: 'border-orange-200 dark:border-orange-500/20' },
   ];
 
   // Configuración del Gráfico de Área (Cronología)
@@ -150,23 +150,43 @@ export default function Home() {
       />
       <div className="space-y-6">
         {/* Hero Banner */}
-        <div className="relative overflow-hidden bg-brand-600 rounded-2xl p-8 lg:p-10 shadow-lg border border-white/20">
+        <div
+          className="relative overflow-hidden rounded-2xl p-8 lg:p-10 shadow-lg"
+          style={{ background: "linear-gradient(135deg, #030711 0%, #0c1428 50%, #030711 100%)" }}
+        >
+          {/* Dot grid */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.04]"
+            style={{
+              backgroundImage: "radial-gradient(circle, #94a3b8 1px, transparent 1px)",
+              backgroundSize: "28px 28px",
+            }}
+          />
+          {/* Glow orbs */}
+          <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl" style={{ background: "rgba(37,99,235,0.18)" }} />
+          <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl" style={{ background: "rgba(124,58,237,0.10)" }} />
+          {/* Top accent line */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
+
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="space-y-3 max-w-xl text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/15 border border-brand-500/25 text-brand-400 text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
+                PlacesHub · Prospección B2B
+              </div>
               <h1 className="text-3xl lg:text-4xl font-bold text-white tracking-tight">
                 ¡Hola buscador! 🚀
               </h1>
-              <p className="text-brand-100 text-base leading-relaxed">
-                Has generado <span className="text-white font-bold">{stats.totalLeads}</span> prospectos en tus últimas búsquedas.{' '}
-                Sigue encontrando nuevas oportunidades hoy mismo.
+              <p className="text-gray-400 text-base leading-relaxed">
+                Has generado{' '}
+                <span className="text-brand-400 font-bold">{stats.totalLeads}</span>{' '}
+                prospectos en tus últimas búsquedas. Sigue encontrando nuevas oportunidades hoy mismo.
               </p>
             </div>
-            <div className="hidden lg:flex items-center justify-center w-36 h-36 bg-white/15 backdrop-blur-xl rounded-3xl border border-white/20">
-              <Target size={64} className="text-white opacity-90" />
+            <div className="hidden lg:flex items-center justify-center w-36 h-36 rounded-3xl border border-white/[0.07] bg-white/[0.04] backdrop-blur-sm shrink-0">
+              <FiCrosshair size={52} className="text-brand-400 opacity-80" />
             </div>
           </div>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/5 rounded-full -ml-10 -mb-10 blur-2xl" />
         </div>
 
         {/* Stats */}
@@ -222,7 +242,7 @@ export default function Home() {
                   <Chart options={radialChartOptions} series={radialSeries} type="radialBar" height={260} />
                   <div className="text-center mt-[-30px]">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-success-50 dark:bg-success-500/10 text-success-600 text-[10px] font-bold uppercase tracking-wider rounded-full border border-success-200 dark:border-success-500/20">
-                      <TrendingUp size={12} /> +10%
+                      <FiTrendingUp size={12} /> +10%
                     </div>
                     <p className="text-xs text-gray-500 mt-6 px-4">
                       Tasa de éxito basada en tus históricos de búsqueda. ¡Sigue así!
@@ -259,7 +279,7 @@ export default function Home() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 group-hover:text-brand-600 transition-colors">
-                        <Activity size={14} />
+                        <FiActivity size={14} />
                       </div>
                       <div className="text-left">
                         <p className="text-sm font-bold text-gray-800 dark:text-white/90 truncate max-w-[150px] md:max-w-xs">{exec.search_term}</p>
@@ -273,7 +293,7 @@ export default function Home() {
                             'bg-error-50 text-error-600 border-error-200 dark:bg-error-500/10 dark:text-error-400'}`}>
                         {exec.status === 'running' ? 'En proceso' : exec.status === 'fallido' ? 'Error' : 'Listo'}
                       </span>
-                      <ChevronRight size={14} className="text-gray-300 group-hover:text-brand-600 group-hover:translate-x-0.5 transition-all" />
+                      <FiChevronRight size={14} className="text-gray-300 group-hover:text-brand-600 group-hover:translate-x-0.5 transition-all" />
                     </div>
                   </button>
                 ))

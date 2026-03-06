@@ -9,10 +9,7 @@ import {
     createColumnHelper,
     type PaginationState,
 } from '@tanstack/react-table';
-import {
-    ChevronLeft, ChevronRight, ChevronFirst, ChevronLast,
-    Calendar, ArrowRight, Loader2, Users, TrendingUp, AlertTriangle,
-} from 'lucide-react';
+import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiCalendar, FiArrowRight, FiUsers, FiTrendingUp, FiAlertTriangle } from "react-icons/fi";
 import PageMeta from '../../components/common/PageMeta';
 
 /* ── time counter for running executions ─────────────────────────────────── */
@@ -43,7 +40,7 @@ function UsageBanner({ usage }: { usage: MonthlyUsage | null }) {
     if (usage.limit === null) {
         return (
             <div className="flex items-center gap-3 px-5 py-3.5 bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-2xl">
-                <TrendingUp size={16} className="text-success-500 shrink-0" />
+                <FiTrendingUp size={16} className="text-success-500 shrink-0" />
                 <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-gray-700 dark:text-white/80">
                         {usage.used.toLocaleString()} leads obtenidos este mes
@@ -73,8 +70,8 @@ function UsageBanner({ usage }: { usage: MonthlyUsage | null }) {
     return (
         <div className={`flex items-center gap-4 px-5 py-3.5 border rounded-2xl ${borderColor}`}>
             {isDanger
-                ? <AlertTriangle size={16} className="text-error-500 shrink-0" />
-                : <TrendingUp size={16} className={`shrink-0 ${isWarning ? 'text-amber-500' : 'text-brand-500'}`} />
+                ? <FiAlertTriangle size={16} className="text-error-500 shrink-0" />
+                : <FiTrendingUp size={16} className={`shrink-0 ${isWarning ? 'text-amber-500' : 'text-brand-500'}`} />
             }
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1.5">
@@ -182,7 +179,7 @@ const Executions = () => {
             cell: info => (
                 <div className="flex items-center gap-3 py-1">
                     <div className="p-2 bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20 rounded-lg text-brand-500">
-                        <Calendar size={13} />
+                        <FiCalendar size={13} />
                     </div>
                     <div className="flex flex-col">
                         <span className="text-gray-800 dark:text-white/90 font-semibold text-sm tracking-tight text-nowrap">
@@ -215,7 +212,7 @@ const Executions = () => {
                 if (status === 'running') {
                     return (
                         <span className="inline-flex items-center gap-1.5 text-[10px] text-purple-500 font-semibold">
-                            <Loader2 size={11} className="animate-spin" /> Extrayendo...
+                            <span className="inline-block w-2.5 h-2.5 border border-current border-t-transparent rounded-full animate-spin opacity-70" /> Extrayendo...
                         </span>
                     );
                 }
@@ -230,7 +227,7 @@ const Executions = () => {
                 return (
                     <div className="flex flex-col gap-1 min-w-[90px]">
                         <div className="flex items-center gap-1.5">
-                            <Users size={11} className="text-brand-400 shrink-0" />
+                            <FiUsers size={11} className="text-brand-400 shrink-0" />
                             <span className="text-sm font-bold text-gray-800 dark:text-white/90 tabular-nums">{count}</span>
                             {maxLeadsPerSearch && (
                                 <span className="text-[10px] text-gray-400 font-semibold">/ {maxLeadsPerSearch}</span>
@@ -288,12 +285,12 @@ const Executions = () => {
                             disabled={!isFinished}
                             className={`flex items-center gap-2 px-5 py-2 text-[10px] font-semibold rounded-lg border transition-all uppercase tracking-widest group
                                 ${isFinished
-                                    ? 'bg-gray-800 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 text-white border-transparent'
+                                    ? 'bg-brand-600 hover:bg-brand-500 text-white border-transparent shadow-sm shadow-brand-600/20'
                                     : 'bg-gray-50 dark:bg-gray-800 text-gray-300 border-gray-100 dark:border-gray-700 cursor-not-allowed'
                                 }`}
                         >
                             {info.row.original.status === 'running' ? 'Extrayendo...' : 'Ver Resultados'}
-                            <ArrowRight size={13} className={isFinished ? 'group-hover:translate-x-0.5 transition-transform' : ''} />
+                            <FiArrowRight size={13} className={isFinished ? 'group-hover:translate-x-0.5 transition-transform' : ''} />
                         </button>
                     </div>
                 );
@@ -323,7 +320,7 @@ const Executions = () => {
                         Historial de Búsquedas
                         {isRefreshing && (
                             <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-brand-500 uppercase tracking-widest animate-pulse">
-                                <Loader2 size={11} className="animate-spin" /> Actualizando
+                                <span className="inline-block w-2.5 h-2.5 border border-current border-t-transparent rounded-full animate-spin opacity-70" /> Actualizando
                             </span>
                         )}
                     </h1>
@@ -381,10 +378,10 @@ const Executions = () => {
                         </span>
                         <div className="flex items-center gap-1.5">
                             {[
-                                { icon: <ChevronFirst size={16} />, onClick: () => table.setPageIndex(0),                    disabled: !table.getCanPreviousPage() },
-                                { icon: <ChevronLeft  size={16} />, onClick: () => table.previousPage(),                    disabled: !table.getCanPreviousPage() },
-                                { icon: <ChevronRight size={16} />, onClick: () => table.nextPage(),                        disabled: !table.getCanNextPage()     },
-                                { icon: <ChevronLast  size={16} />, onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() },
+                                { icon: <FiChevronsLeft size={16} />, onClick: () => table.setPageIndex(0),                    disabled: !table.getCanPreviousPage() },
+                                { icon: <FiChevronLeft  size={16} />, onClick: () => table.previousPage(),                   disabled: !table.getCanPreviousPage() },
+                                { icon: <FiChevronRight size={16} />, onClick: () => table.nextPage(),                       disabled: !table.getCanNextPage()     },
+                                { icon: <FiChevronsRight size={16} />, onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() },
                             ].map((btn, i) => (
                                 <button key={i}
                                     className="p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-brand-50 dark:hover:bg-brand-500/10 hover:text-brand-500 text-gray-400 disabled:opacity-20 transition-all"
@@ -399,7 +396,7 @@ const Executions = () => {
                 {data.length === 0 && !loading && (
                     <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
                         <div className="p-6 bg-gray-100 dark:bg-gray-700 rounded-full w-fit mx-auto mb-6">
-                            <Calendar size={40} className="text-brand-500" />
+                            <FiCalendar size={40} className="text-brand-500" />
                         </div>
                         <p className="text-gray-700 dark:text-white/90 text-sm font-bold mb-3">No hay búsquedas registradas</p>
                         <button onClick={() => navigate('/buscador')}
