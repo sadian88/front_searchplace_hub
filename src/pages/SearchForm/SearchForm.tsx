@@ -324,7 +324,7 @@ const SearchForm = () => {
                                     {/* Concurrent chip */}
                                     <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-colors ${concurrentColors[concurrentStatus]}`}>
                                         {concurrentStatus === 'limit'
-                                            ? <Lock size={12} className="shrink-0" />
+                                            ? <FiLock size={12} className="shrink-0" />
                                             : <FiZap size={12} className="shrink-0" />
                                         }
                                         <div className="min-w-0">

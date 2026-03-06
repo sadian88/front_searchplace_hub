@@ -8,7 +8,6 @@ import { FiCheckCircle } from "react-icons/fi";
 import { FiArrowRight } from "react-icons/fi";
 import { FiMenu } from "react-icons/fi";
 import { FiX } from "react-icons/fi";
-import { FiZap } from "react-icons/fi";
 import { FiUsers } from "react-icons/fi";
 import { FiGlobe } from "react-icons/fi";
 import { FiStar } from "react-icons/fi";
