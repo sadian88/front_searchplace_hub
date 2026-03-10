@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <span className="text-brand-500">Hub</span>
           </span>
         </div>
-        <div className="w-full max-w-md mx-auto">
+        <div className="w-full max-w-lg mx-auto">
           {children}
         </div>
       </div>

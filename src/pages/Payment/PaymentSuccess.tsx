@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { CheckCircle } from "lucide-react";
+import { FiCheckCircle } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 
 export default function PaymentSuccess() {
@@ -17,12 +17,12 @@ export default function PaymentSuccess() {
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
         <div className="flex justify-center mb-4">
           <div className="w-16 h-16 rounded-full bg-success-50 dark:bg-success-500/10 flex items-center justify-center">
-            <CheckCircle size={36} className="text-success-500" />
+            <FiCheckCircle size={36} className="text-success-500" />
           </div>
         </div>
 
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">
-          Pago exitoso
+          ¡Pago exitoso!
         </h1>
 
         {refreshed && user?.plan ? (
@@ -35,13 +35,13 @@ export default function PaymentSuccess() {
           </p>
         ) : (
           <p className="text-gray-500 dark:text-gray-400 mb-6">
-            Actualizando tu plan...
+            Actualizando tu plan{refreshed ? "..." : <span className="inline-block w-3 h-3 border-2 border-brand-300 border-t-brand-600 rounded-full animate-spin ml-1 align-middle" />}
           </p>
         )}
 
         <button
           onClick={() => navigate("/dashboard")}
-          className="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-colors"
+          className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition-colors"
         >
           Ir al dashboard
         </button>

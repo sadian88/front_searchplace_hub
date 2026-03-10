@@ -124,9 +124,8 @@ export default function SignUpForm() {
   const emailHasError = Boolean(emailError);
 
   return (
-    <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
-      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto px-6 sm:px-0">
-        <div className="mb-6 sm:mb-8">
+    <div className="w-full">
+      <div className="mb-6 sm:mb-8">
           <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
             Crear cuenta
           </h1>
@@ -299,7 +298,6 @@ export default function SignUpForm() {
             Inicia sesión
           </Link>
         </p>
-      </div>
     </div>
   );
 }

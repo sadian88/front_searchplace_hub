@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { Clock } from "lucide-react";
+import { FiClock } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 
 const POLL_INTERVAL_MS = 5000;
@@ -13,18 +13,14 @@ export default function PaymentPending() {
   const [dots, setDots] = useState(".");
 
   useEffect(() => {
-    // Animated dots
     const dotsInterval = setInterval(() => {
       setDots((d) => (d.length >= 3 ? "." : d + "."));
     }, 500);
 
-    // Polling
     const poll = setInterval(async () => {
       polls.current += 1;
       await refreshUser();
-      if (polls.current >= MAX_POLLS) {
-        clearInterval(poll);
-      }
+      if (polls.current >= MAX_POLLS) clearInterval(poll);
     }, POLL_INTERVAL_MS);
 
     return () => {
@@ -38,7 +34,7 @@ export default function PaymentPending() {
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
         <div className="flex justify-center mb-4">
           <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
-            <Clock size={36} className="text-amber-500" />
+            <FiClock size={36} className="text-amber-500" />
           </div>
         </div>
 
@@ -52,7 +48,7 @@ export default function PaymentPending() {
         <div className="flex flex-col gap-3">
           <button
             onClick={() => navigate("/dashboard")}
-            className="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-colors"
+            className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition-colors"
           >
             Ir al dashboard
           </button>
