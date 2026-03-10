@@ -162,6 +162,19 @@ const Leads = () => {
                 </select>
             ),
         }),
+        columnHelper.accessor('created_at', {
+            header: 'Fecha',
+            cell: info => {
+                const d = info.getValue();
+                if (!d) return <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>;
+                return (
+                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        <FiCalendar size={11} className="shrink-0 text-gray-400" />
+                        {new Date(d).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </div>
+                );
+            },
+        }),
         columnHelper.accessor('actions' as any, {
             header: '',
             cell: info => (

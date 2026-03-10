@@ -18,14 +18,14 @@ const navItems: NavItem[] = [
     path: "/dashboard",
   },
   {
-    icon: <TableIcon />,
-    name: "Leads Hub",
-    path: "/leads",
-  },
-  {
     icon: <ListIcon />,
     name: "Buscador",
     path: "/buscador",
+  },
+  {
+    icon: <TableIcon />,
+    name: "Mis Resultados",
+    path: "/leads",
   },
   {
     icon: <HorizontaLDots />,

@@ -194,14 +194,21 @@ const Executions = () => {
         }),
         columnHelper.accessor('search_term', {
             header: 'Búsqueda',
-            cell: info => (
-                <div className="flex flex-col py-1">
-                    <span className="text-gray-800 dark:text-white/90 font-semibold text-sm tracking-tight">{info.getValue()}</span>
-                    <span className="text-[9px] uppercase font-semibold tracking-wider bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-md border border-gray-200 dark:border-gray-600 w-fit mt-1">
-                        {info.row.original.location}
-                    </span>
-                </div>
-            ),
+            cell: info => {
+                const displayName = info.row.original.category || info.getValue();
+                const rawTerm = info.getValue();
+                return (
+                    <div className="flex flex-col py-1">
+                        <span className="text-gray-800 dark:text-white/90 font-semibold text-sm tracking-tight">{displayName}</span>
+                        {displayName !== rawTerm && (
+                            <span className="text-[9px] text-gray-400 dark:text-gray-500 mt-0.5">{rawTerm}</span>
+                        )}
+                        <span className="text-[9px] uppercase font-semibold tracking-wider bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-md border border-gray-200 dark:border-gray-600 w-fit mt-1">
+                            {info.row.original.location}
+                        </span>
+                    </div>
+                );
+            },
         }),
         columnHelper.accessor('results_count', {
             header: 'Resultados',

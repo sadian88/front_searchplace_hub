@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
 import api from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
 import { FiPlay, FiMapPin, FiSearch, FiFilter, FiCrosshair, FiCheckCircle, FiGlobe, FiCircle, FiOctagon, FiUsers, FiAlertTriangle, FiZap, FiLock } from "react-icons/fi";
@@ -9,11 +9,42 @@ import PageMeta from '../../components/common/PageMeta';
 const SearchForm = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    // Pre-fill from global search bar (?q=term)
+    useEffect(() => {
+        const q = searchParams.get('q');
+        if (q) {
+            setCatInput(q);
+            setFormData(prev => ({ ...prev, search_term: q }));
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
-    const [categories, setCategories] = useState<string[]>([]);
+    const [categories, setCategories] = useState<{ name: string; display_name: string }[]>([]);
+
+    // Combobox state
+    const [catInput, setCatInput] = useState('Restaurante');
+    const [catOpen, setCatOpen] = useState(false);
+    const catRef = useRef<HTMLDivElement>(null);
+
+    const filteredCats = catInput.trim()
+        ? categories.filter(c =>
+            c.display_name.toLowerCase().includes(catInput.toLowerCase()) ||
+            c.name.toLowerCase().includes(catInput.toLowerCase())
+          )
+        : categories;
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (catRef.current && !catRef.current.contains(e.target as Node)) setCatOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
 
     // Plan limits from authenticated user
     const plan = user?.plan;
@@ -56,11 +87,12 @@ const SearchForm = () => {
     useEffect(() => {
         api.get('/executions/categories')
             .then(res => {
-                const cats: string[] = res.data;
+                const cats: { name: string; display_name: string }[] = res.data;
                 setCategories(cats);
                 if (cats.length > 0) {
-                    const def = cats.includes('Restaurante') ? 'Restaurante' : cats[0];
-                    setFormData(prev => ({ ...prev, search_term: def }));
+                    const def = cats.find(c => c.name === 'Restaurante') ?? cats[0];
+                    setFormData(prev => ({ ...prev, search_term: def.name }));
+                    setCatInput(def.display_name);
                 }
             })
             .catch(err => console.error('Error fetching categories:', err));
@@ -111,9 +143,13 @@ const SearchForm = () => {
         setLoading(true);
         setError('');
         try {
+            // Use the combobox input as search_term (free text or predefined)
+            const termToUse = catInput.trim() || formData.search_term;
+            const matchedCat = categories.find(c => c.name === termToUse || c.display_name === termToUse);
             await api.post('/executions/launch', {
                 ...formData,
-                category: formData.search_term,
+                search_term: termToUse,
+                category: matchedCat ? matchedCat.display_name : termToUse,
                 postal_code: formData.postal_code || null,
                 latitude: formData.latitude === '' ? null : formData.latitude,
                 longitude: formData.longitude === '' ? null : formData.longitude,
@@ -198,27 +234,61 @@ const SearchForm = () => {
                                     <FiSearch size={12} className="text-brand-500" /> Parámetros Base
                                 </h3>
 
-                                {/* Category */}
-                                <div className="space-y-1.5">
+                                {/* Category combobox */}
+                                <div className="space-y-1.5" ref={catRef}>
                                     <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                                         Término de Búsqueda
                                     </label>
                                     <div className="relative">
-                                        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600" size={14} />
-                                        <select
-                                            name="search_term"
-                                            value={formData.search_term}
-                                            onChange={handleChange}
-                                            className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-white/90 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:border-brand-300 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all appearance-none cursor-pointer"
+                                        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 pointer-events-none" size={14} />
+                                        <input
+                                            type="text"
+                                            value={catInput}
+                                            onChange={e => { setCatInput(e.target.value); setCatOpen(true); }}
+                                            onFocus={() => setCatOpen(true)}
+                                            placeholder="Ej: Restaurante, Gimnasio..."
+                                            className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-white/90 rounded-xl pl-10 pr-9 py-2.5 text-sm focus:border-brand-300 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
                                             required
-                                        >
-                                            <option value="" disabled>Selecciona una categoría...</option>
-                                            {categories.map((cat, i) => <option key={i} value={cat}>{cat}</option>)}
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-300">
-                                            <FiFilter size={12} />
-                                        </div>
+                                        />
+                                        {catInput && (
+                                            <button
+                                                type="button"
+                                                onClick={() => { setCatInput(''); setCatOpen(true); setFormData(prev => ({ ...prev, search_term: '' })); }}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                                            >
+                                                <FiFilter size={12} />
+                                            </button>
+                                        )}
+                                        {/* Dropdown */}
+                                        {catOpen && filteredCats.length > 0 && (
+                                            <ul className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-theme-lg overflow-hidden max-h-52 overflow-y-auto">
+                                                {filteredCats.map((cat, i) => (
+                                                    <li key={i}>
+                                                        <button
+                                                            type="button"
+                                                            onMouseDown={e => e.preventDefault()}
+                                                            onClick={() => {
+                                                                setCatInput(cat.display_name);
+                                                                setFormData(prev => ({ ...prev, search_term: cat.name }));
+                                                                setCatOpen(false);
+                                                            }}
+                                                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-brand-50 dark:hover:bg-brand-500/10 hover:text-brand-600 dark:hover:text-brand-400 transition-colors ${
+                                                                formData.search_term === cat.name ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold' : 'text-gray-700 dark:text-gray-200'
+                                                            }`}
+                                                        >
+                                                            {cat.display_name}
+                                                            {cat.display_name !== cat.name && (
+                                                                <span className="ml-2 text-[10px] text-gray-400 dark:text-gray-500">{cat.name}</span>
+                                                            )}
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
                                     </div>
+                                    <p className="text-[10px] text-gray-400 dark:text-gray-500">
+                                        Escribe libremente o selecciona una sugerencia
+                                    </p>
                                 </div>
 
                                 {/* Location (read-only) */}

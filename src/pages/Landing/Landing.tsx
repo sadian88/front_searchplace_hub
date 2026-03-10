@@ -1022,11 +1022,7 @@ function Footer() {
 
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-600">
-            © {new Date().getFullYear()} PlacesHub · HubCapture. Todos los
-            derechos reservados.
-          </p>
-          <p className="text-xs text-gray-700">
-            Desarrollado con ♥ para equipos comerciales
+            © 2026 PlacesHub · HubMyPyme S.A.S | Un producto de Marketing de Bolsillo. Todos los derechos reservados.
           </p>
         </div>
       </div>

@@ -4,16 +4,19 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Search, RotateCcw, Trash2, MapPin } from 'lucide-react';
 
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-const DefaultIcon = L.icon({
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+const CrosshairIcon = L.divIcon({
+    html: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="22" y1="12" x2="18" y2="12"></line>
+        <line x1="6" y1="12" x2="2" y2="12"></line>
+        <line x1="12" y1="6" x2="12" y2="2"></line>
+        <line x1="12" y1="22" x2="12" y2="18"></line>
+    </svg>`,
+    className: '',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
 });
-L.Marker.prototype.options.icon = DefaultIcon;
+L.Marker.prototype.options.icon = CrosshairIcon;
 
 interface MapSelectorProps {
     searchType: 'default' | 'circle' | 'polygon';

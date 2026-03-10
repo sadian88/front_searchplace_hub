@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCheckCircle, FiShield, FiZap, FiCode, FiHeadphones, FiTrendingUp, FiArrowUpCircle } from "react-icons/fi";
+import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCheckCircle, FiShield, FiZap, FiTrendingUp, FiArrowUpCircle, FiCalendar } from "react-icons/fi";
 import PageMeta from "../../components/common/PageMeta";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
@@ -328,7 +328,7 @@ function PlanCard() {
         </span>
       </div>
 
-      {/* Precio */}
+      {/* Precio + fecha de corte */}
       <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-end gap-1">
           <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
@@ -336,9 +336,20 @@ function PlanCard() {
           </span>
           <span className="text-sm text-gray-400 mb-1">/ mes</span>
         </div>
-        {plan.price_monthly === 0 && (
+        {plan.price_monthly === 0 ? (
           <p className="text-xs text-gray-400 mt-0.5">Sin costo, para siempre</p>
-        )}
+        ) : plan.expires_at ? (
+          <p className="text-xs text-gray-400 mt-1">
+            Fecha de corte:{" "}
+            <span className="font-semibold text-gray-600 dark:text-gray-300">
+              {new Date(plan.expires_at).toLocaleDateString("es-CO", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
+          </p>
+        ) : null}
       </div>
 
       {/* Límites y características */}
@@ -429,7 +440,7 @@ function PlanCard() {
 
 /* ── sección uso del plan ────────────────────────────────────────────────── */
 
-interface MonthlyUsage { used: number; limit: number | null; percent: number | null }
+interface MonthlyUsage { used: number; limit: number | null; percent: number | null; period_start: string; reset_date: string }
 
 function UsageCard() {
   const { user } = useAuth();
@@ -465,10 +476,29 @@ function UsageCard() {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
-        <FiTrendingUp size={18} className="text-brand-600 dark:text-brand-400" />
-        <h2 className="font-bold text-gray-800 dark:text-white text-sm">Uso del plan</h2>
-        <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">— mes actual</span>
+      <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          <FiTrendingUp size={18} className="text-brand-600 dark:text-brand-400" />
+          <h2 className="font-bold text-gray-800 dark:text-white text-sm">Uso del plan</h2>
+        </div>
+        {monthlyUsage && (
+          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+            <span className="flex items-center gap-1">
+              <FiCalendar size={11} className="shrink-0" />
+              Desde:{" "}
+              <span className="font-semibold text-gray-700 dark:text-gray-300 ml-0.5">
+                {new Date(monthlyUsage.period_start).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" })}
+              </span>
+            </span>
+            <span className="flex items-center gap-1">
+              <FiCalendar size={11} className="shrink-0 text-brand-500" />
+              Reset:{" "}
+              <span className="font-semibold text-brand-600 dark:text-brand-400 ml-0.5">
+                {new Date(monthlyUsage.reset_date).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" })}
+              </span>
+            </span>
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -621,21 +651,27 @@ export default function Profile() {
               <p className="text-white/70 text-sm mt-0.5">{user?.email}</p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <StatChip icon={<FiShield size={12} />} label={user?.plan.display_name ?? "Free"} />
-                <StatChip icon={<FiCode size={12} />} label={`ID: ${user?.id}`} />
-                <StatChip icon={<FiHeadphones size={12} />} label={user?.plan.support_level === "dedicated" ? "Account manager" : user?.plan.support_level === "priority" ? "Soporte prioritario" : "Soporte email"} />
+                {user?.plan.expires_at ? (
+                  <StatChip
+                    icon={<FiCalendar size={12} />}
+                    label={`Corte: ${new Date(user.plan.expires_at).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" })}`}
+                  />
+                ) : user?.plan.price_monthly === 0 ? (
+                  <StatChip icon={<FiCalendar size={12} />} label="Sin fecha de corte" />
+                ) : null}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Uso del plan — visible al inicio */}
+        <UsageCard />
 
         {/* Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <BasicDataCard />
           <PlanCard />
         </div>
-
-        {/* Uso */}
-        <UsageCard />
       </div>
     </>
   );

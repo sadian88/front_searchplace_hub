@@ -14,6 +14,7 @@ export interface UserPlan {
     can_export_csv: boolean;
     can_export_api: boolean;
     support_level: string;
+    expires_at: string | null; // ISO date — null si es plan free/sin pago
 }
 
 export interface AuthUser {

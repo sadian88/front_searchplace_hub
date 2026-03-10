@@ -103,7 +103,7 @@ const PlaceDetail: React.FC = () => {
                         <button onClick={handleSave} disabled={saving}
                             className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-8 py-2.5 bg-gray-800 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 text-white rounded-xl transition-all text-xs font-bold shadow-lg uppercase tracking-widest disabled:opacity-50">
                             {saving ? <Loader2 className="animate-spin" size={15} /> : success ? <CheckCircle size={15} /> : <Save size={15} />}
-                            {success ? '¡Guardado!' : 'Guardar'}
+                            {success ? '¡Actualizado!' : 'Actualizar'}
                         </button>
                     </div>
                 </div>
