@@ -17,6 +17,7 @@ import Home from "./pages/Dashboard/Home";
 import Leads from "./pages/Leads/Leads";
 import SearchForm from "./pages/SearchForm/SearchForm";
 import Executions from "./pages/Executions/Executions";
+import ExecutionDetails from "./pages/ExecutionDetails/ExecutionDetails";
 import PlaceDetail from "./pages/PlaceDetail/PlaceDetail";
 import Profile from "./pages/Profile/Profile";
 import PaymentSuccess from "./pages/Payment/PaymentSuccess";
@@ -56,6 +57,7 @@ export default function App() {
             <Route path="/leads" element={<Leads />} />
             <Route path="/buscador" element={<SearchForm />} />
             <Route path="/executions" element={<Executions />} />
+            <Route path="/executions/:id" element={<ExecutionDetails />} />
             <Route path="/places/:id" element={<PlaceDetail />} />
             <Route path="/profile" element={<Profile />} />
           </Route>

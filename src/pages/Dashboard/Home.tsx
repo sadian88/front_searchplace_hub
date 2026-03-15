@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import api from '../../api/api';
 import { FiUsers, FiActivity, FiCrosshair, FiChevronRight, FiTrendingUp } from "react-icons/fi";
 import PageMeta from "../../components/common/PageMeta";
+import PlanCard from "../../components/common/PlanCard";
 import Chart from 'react-apexcharts';
 
 export default function Home() {
@@ -274,7 +275,7 @@ export default function Home() {
                 recentExecutions.map((exec) => (
                   <button
                     key={exec.id}
-                    onClick={() => exec.status === 'terminado' && navigate(`/executions/${exec.id}`)}
+                    onClick={() => navigate(`/executions/${exec.id}`)}
                     className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/40 hover:bg-brand-50 dark:hover:bg-brand-500/10 border border-gray-200 dark:border-gray-700 rounded-xl transition-all group"
                   >
                     <div className="flex items-center gap-3">
@@ -304,13 +305,7 @@ export default function Home() {
               )}
             </div>
           </div>
-          <div className="p-8 bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20 rounded-2xl relative overflow-hidden flex flex-col justify-center border-dashed border-2">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white/90 mb-3">Tip del Experto 💡</h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
-              Usa el mapa interactivo para delimitar polígonos exactos. Esto incrementa la calidad de tus prospectos en un 40%.
-            </p>
-            <div className="w-20 h-20 bg-brand-600/20 rounded-full blur-2xl animate-pulse ml-auto" />
-          </div>
+          <PlanCard compact />
         </div>
       </div>
     </>

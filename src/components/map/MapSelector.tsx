@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Circle, Polygon, useMapEvents, useMap 
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Search, RotateCcw, Trash2, MapPin } from 'lucide-react';
+import { FiCrosshair } from 'react-icons/fi';
 
 const CrosshairIcon = L.divIcon({
     html: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -27,6 +28,8 @@ interface MapSelectorProps {
     onLocationChange: (lat: number, lng: number, address?: string) => void;
     onRadiusChange: (radius: number) => void;
     onPolygonChange: (points: [number, number][]) => void;
+    onGpsCenter?: () => void;
+    geoLoading?: boolean;
 }
 
 const ChangeView = ({ center }: { center: [number, number] }) => {
@@ -42,7 +45,8 @@ const MapEvents = ({ onMapClick }: { onMapClick: (lat: number, lng: number) => v
 
 const MapSelector: React.FC<MapSelectorProps> = ({
     searchType, latitude, longitude, radius, polygonPoints,
-    onLocationChange, onRadiusChange, onPolygonChange
+    onLocationChange, onRadiusChange, onPolygonChange,
+    onGpsCenter, geoLoading
 }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
@@ -112,7 +116,7 @@ const MapSelector: React.FC<MapSelectorProps> = ({
                 </button>
             </div>
 
-            <div className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg h-80 z-0">
+            <div className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg h-[420px] z-0">
                 <MapContainer center={center} zoom={13} style={{ height: '100%', width: '100%' }}>
                     <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -138,6 +142,21 @@ const MapSelector: React.FC<MapSelectorProps> = ({
                     )}
                 </MapContainer>
                 <div className="absolute top-3 right-3 flex flex-col gap-2 z-[1000]">
+                    {/* GPS re-center button */}
+                    {onGpsCenter && (
+                        <button
+                            type="button"
+                            onClick={onGpsCenter}
+                            disabled={geoLoading}
+                            className="p-2 bg-white/90 dark:bg-gray-800/90 border border-brand-200 dark:border-brand-500/40 text-brand-500 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-all shadow-md backdrop-blur-sm disabled:opacity-60"
+                            title="Mi ubicación GPS"
+                        >
+                            {geoLoading
+                                ? <span className="w-4 h-4 border-2 border-brand-300 border-t-brand-500 rounded-full animate-spin block" />
+                                : <FiCrosshair size={16} />
+                            }
+                        </button>
+                    )}
                     {searchType === 'polygon' && polygonPoints.length > 0 && (
                         <>
                             <button type="button" onClick={() => onPolygonChange(polygonPoints.slice(0, -1))}

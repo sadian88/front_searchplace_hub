@@ -5,7 +5,7 @@ import {
     useReactTable, getCoreRowModel, flexRender,
     createColumnHelper, type PaginationState
 } from '@tanstack/react-table';
-import { Star, Tag, ChevronLeft, ChevronRight, Globe, MapPin, ArrowLeft, LayoutGrid, Building2 } from 'lucide-react';
+import { Star, Tag, ChevronLeft, ChevronRight, Globe, MapPin, ArrowLeft, LayoutGrid, Building2, Phone } from 'lucide-react';
 import PageMeta from "../../components/common/PageMeta";
 
 const ExecutionDetails = () => {
@@ -72,6 +72,17 @@ const ExecutionDetails = () => {
                         <Tag size={9} /> {info.row.original.category_name || 'SIN CATEGORÍA'}
                     </span>
                 </div>
+            )
+        }),
+        columnHelper.accessor('phone', {
+            header: 'Teléfono',
+            cell: info => info.getValue() ? (
+                <div className="flex items-center gap-1.5">
+                    <Phone size={11} className="text-brand-400 shrink-0" />
+                    <span className="text-xs font-mono text-gray-700 dark:text-white/80">{info.getValue()}</span>
+                </div>
+            ) : (
+                <span className="text-[10px] text-gray-300 dark:text-gray-600">—</span>
             )
         }),
         columnHelper.accessor('total_score', {

@@ -9,7 +9,7 @@ import {
     createColumnHelper,
     type PaginationState,
 } from '@tanstack/react-table';
-import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiCalendar, FiArrowRight, FiUsers, FiTrendingUp, FiAlertTriangle } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiCalendar, FiArrowRight, FiUsers, FiTrendingUp, FiAlertTriangle, FiRefreshCw } from "react-icons/fi";
 import PageMeta from '../../components/common/PageMeta';
 
 /* ── time counter for running executions ─────────────────────────────────── */
@@ -106,6 +106,8 @@ const Executions = () => {
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [monthlyUsage, setMonthlyUsage] = useState<MonthlyUsage | null>(null);
+    const [relaunchingId, setRelaunchingId] = useState<string | null>(null);
+    const [relaunchError, setRelaunchError] = useState<{ id: string; msg: string } | null>(null);
 
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
     const [pageCount, setPageCount] = useState(0);
@@ -168,6 +170,43 @@ const Executions = () => {
         const interval = setInterval(() => fetchAll(true), 10_000);
         return () => clearInterval(interval);
     }, [pageIndex, pageSize]);
+
+    /* ── relaunch failed execution ────────────────────────────────────────── */
+
+    const handleRelaunch = async (exec: any) => {
+        setRelaunchingId(exec.id);
+        setRelaunchError(null);
+        try {
+            await api.post('/executions/launch', {
+                search_term:    exec.search_term,
+                location:       exec.location,
+                language:       exec.language,
+                country:        exec.country,
+                city:           exec.city,
+                state:          exec.state,
+                continent:      exec.continent,
+                postal_code:    exec.postal_code || null,
+                latitude:       exec.latitude,
+                longitude:      exec.longitude,
+                category:       exec.category,
+                has_website:    exec.has_website,
+                exact_name:     exec.exact_name,
+                search_type:    exec.search_type,
+                radius:         exec.radius,
+                polygon_points: exec.polygon_points ? JSON.parse(exec.polygon_points) : [],
+                max_leads:      exec.max_leads ?? 50,
+                skip_closed:    exec.skip_closed ?? false,
+                min_rating:     exec.min_rating ?? 0,
+                min_reviews:    exec.min_reviews ?? 0,
+            });
+            await fetchAll(true);
+        } catch (err: any) {
+            const msg = err.response?.data?.message || 'No se pudo relanzar la búsqueda.';
+            setRelaunchError({ id: exec.id, msg });
+        } finally {
+            setRelaunchingId(null);
+        }
+    };
 
     /* ── columns ──────────────────────────────────────────────────────────── */
 
