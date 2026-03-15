@@ -34,7 +34,7 @@ export default function PaymentSuccess() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-5">
           <div className="w-16 h-16 rounded-full bg-success-50 dark:bg-success-500/10 flex items-center justify-center">
             <FiCheckCircle size={36} className="text-success-500" />
           </div>
@@ -71,6 +71,13 @@ export default function PaymentSuccess() {
         >
           Ir al dashboard
         </button>
+
+        <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
+          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Procesado por</span>
+          <div className="bg-white rounded-lg px-2 py-1 border border-gray-200">
+            <img src="/images/mp-logo.png" alt="MercadoPago" className="h-5 w-auto object-contain" />
+          </div>
+        </div>
       </div>
     </div>
   );

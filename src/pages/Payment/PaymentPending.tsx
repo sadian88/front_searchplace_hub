@@ -47,7 +47,7 @@ export default function PaymentPending() {
 
         <div className="flex flex-col gap-3">
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/")}
             className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition-colors"
           >
             Ir al dashboard
@@ -58,6 +58,13 @@ export default function PaymentPending() {
           >
             Ver mi perfil
           </button>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
+          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Procesado por</span>
+          <div className="bg-white rounded-lg px-2 py-1 border border-gray-200">
+            <img src="/images/mp-logo.png" alt="MercadoPago" className="h-5 w-auto object-contain" />
+          </div>
         </div>
       </div>
     </div>

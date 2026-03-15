@@ -141,6 +141,9 @@ export default function PlanCard({ compact = false }: { compact?: boolean }) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <div className="bg-white rounded px-1.5 py-0.5 border border-gray-200 shrink-0">
+                    <img src="/images/mp-logo.png" alt="MercadoPago" className="h-4 w-auto object-contain" />
+                  </div>
                   <span className="text-sm font-extrabold text-brand-600 dark:text-brand-400">
                     ${p.price_monthly}/mes
                   </span>

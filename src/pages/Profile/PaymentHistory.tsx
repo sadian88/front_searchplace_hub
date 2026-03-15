@@ -144,6 +144,14 @@ export default function PaymentHistory() {
       <div className="space-y-6">
         <ProfileHero activeTab="pagos" />
 
+        {/* MP brand strip */}
+        <div className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm w-fit">
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pagos procesados por</span>
+          <div className="bg-white rounded-lg px-3 py-1 border border-gray-200">
+            <img src="/images/mp-logo.png" alt="MercadoPago" className="h-6 w-auto object-contain" />
+          </div>
+        </div>
+
         {/* Summary chips */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[

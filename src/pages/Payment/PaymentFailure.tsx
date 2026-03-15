@@ -88,11 +88,18 @@ export default function PaymentFailure() {
             Volver a mi perfil
           </button>
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/")}
             className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <FiHome size={13} /> Ir al dashboard
           </button>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
+          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Procesado por</span>
+          <div className="bg-white rounded-lg px-2 py-1 border border-gray-200">
+            <img src="/images/mp-logo.png" alt="MercadoPago" className="h-5 w-auto object-contain" />
+          </div>
         </div>
       </div>
     </div>
