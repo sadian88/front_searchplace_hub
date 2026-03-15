@@ -152,40 +152,44 @@ export default function Home() {
       <div className="space-y-6">
         {/* Hero Banner */}
         <div
-          className="relative overflow-hidden rounded-2xl p-8 lg:p-10 shadow-lg"
+          className="relative overflow-hidden rounded-2xl px-6 py-4 shadow-lg"
           style={{ background: "linear-gradient(135deg, #030711 0%, #0c1428 50%, #030711 100%)" }}
         >
-          {/* Dot grid */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(circle, #94a3b8 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
-            }}
-          />
-          {/* Glow orbs */}
-          <div className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl" style={{ background: "rgba(37,99,235,0.18)" }} />
-          <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl" style={{ background: "rgba(124,58,237,0.10)" }} />
-          {/* Top accent line */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
+            style={{ backgroundImage: "radial-gradient(circle, #94a3b8 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+          <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl" style={{ background: "rgba(37,99,235,0.18)" }} />
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
 
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="space-y-3 max-w-xl text-center md:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/15 border border-brand-500/25 text-brand-400 text-xs font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
-                PlacesHub · Prospección B2B
+          <div className="relative z-10 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl border border-white/[0.07] bg-white/[0.04] shrink-0">
+                <FiCrosshair size={20} className="text-brand-400 opacity-80" />
               </div>
-              <h1 className="text-3xl lg:text-4xl font-bold text-white tracking-tight">
-                ¡Hola buscador! 🚀
-              </h1>
-              <p className="text-gray-400 text-base leading-relaxed">
-                Has generado{' '}
-                <span className="text-brand-400 font-bold">{stats.totalLeads}</span>{' '}
-                prospectos en tus últimas búsquedas. Sigue encontrando nuevas oportunidades hoy mismo.
-              </p>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <h1 className="text-lg font-bold text-white tracking-tight">¡Hola buscador!</h1>
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-brand-500/15 border border-brand-500/25 text-brand-400 text-[10px] font-semibold">
+                    <span className="w-1 h-1 rounded-full bg-brand-400 animate-pulse" />
+                    PlacesHub
+                  </span>
+                </div>
+                <p className="text-gray-400 text-xs leading-snug">
+                  Has generado{' '}
+                  <span className="text-brand-400 font-bold">{stats.totalLeads.toLocaleString()}</span>{' '}
+                  prospectos en tus búsquedas.
+                </p>
+              </div>
             </div>
-            <div className="hidden lg:flex items-center justify-center w-36 h-36 rounded-3xl border border-white/[0.07] bg-white/[0.04] backdrop-blur-sm shrink-0">
-              <FiCrosshair size={52} className="text-brand-400 opacity-80" />
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="text-right hidden md:block">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Búsquedas</p>
+                <p className="text-xl font-black text-white tabular-nums">{stats.totalExecutions.toLocaleString()}</p>
+              </div>
+              <div className="w-px h-8 bg-white/10 hidden md:block" />
+              <div className="text-right hidden md:block">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">En proceso</p>
+                <p className="text-xl font-black text-brand-400 tabular-nums">{stats.activeProcesses}</p>
+              </div>
             </div>
           </div>
         </div>

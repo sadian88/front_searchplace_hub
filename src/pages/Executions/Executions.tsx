@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import api from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
@@ -173,7 +173,7 @@ const Executions = () => {
 
     /* ── relaunch failed execution ────────────────────────────────────────── */
 
-    const handleRelaunch = async (exec: any) => {
+    const handleRelaunch = useCallback(async (exec: any) => {
         setRelaunchingId(exec.id);
         setRelaunchError(null);
         try {
@@ -193,7 +193,9 @@ const Executions = () => {
                 exact_name:     exec.exact_name,
                 search_type:    exec.search_type,
                 radius:         exec.radius,
-                polygon_points: exec.polygon_points ? JSON.parse(exec.polygon_points) : [],
+                polygon_points: Array.isArray(exec.polygon_points)
+                    ? exec.polygon_points
+                    : (exec.polygon_points ? JSON.parse(exec.polygon_points) : []),
                 max_leads:      exec.max_leads ?? 50,
                 skip_closed:    exec.skip_closed ?? false,
                 min_rating:     exec.min_rating ?? 0,
@@ -201,12 +203,14 @@ const Executions = () => {
             });
             await fetchAll(true);
         } catch (err: any) {
-            const msg = err.response?.data?.message || 'No se pudo relanzar la búsqueda.';
+            console.error('[Relaunch] error:', err);
+            const msg = err.response?.data?.message || err.message || 'No se pudo relanzar la búsqueda.';
             setRelaunchError({ id: exec.id, msg });
         } finally {
             setRelaunchingId(null);
         }
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pageIndex, pageSize]);
 
     /* ── columns ──────────────────────────────────────────────────────────── */
 
@@ -323,11 +327,38 @@ const Executions = () => {
         columnHelper.accessor('actions' as any, {
             header: '',
             cell: info => {
-                const isFinished = info.row.original.status === 'terminado';
+                const exec = info.row.original;
+                const status = exec.status;
+                const isFinished = status === 'terminado';
+                const isFailed = status === 'fallido';
+                const isRelaunching = relaunchingId === exec.id;
+                const rowError = relaunchError?.id === exec.id ? relaunchError.msg : null;
+
+                if (isFailed) {
+                    return (
+                        <div className="flex flex-col items-end gap-1">
+                            <button
+                                onClick={() => handleRelaunch(exec)}
+                                disabled={isRelaunching}
+                                className="flex items-center gap-2 px-4 py-2 text-[10px] font-semibold rounded-lg border transition-all uppercase tracking-widest bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/20 disabled:opacity-60"
+                            >
+                                {isRelaunching
+                                    ? <span className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                                    : <FiRefreshCw size={12} />
+                                }
+                                Relanzar
+                            </button>
+                            {rowError && (
+                                <span className="text-[9px] text-error-500 font-semibold max-w-[140px] text-right leading-tight">{rowError}</span>
+                            )}
+                        </div>
+                    );
+                }
+
                 return (
                     <div className="flex justify-end">
                         <button
-                            onClick={() => isFinished && navigate(`/leads?execution=${info.row.original.id}`)}
+                            onClick={() => isFinished && navigate(`/leads?execution=${exec.id}`)}
                             disabled={!isFinished}
                             className={`flex items-center gap-2 px-5 py-2 text-[10px] font-semibold rounded-lg border transition-all uppercase tracking-widest group
                                 ${isFinished
@@ -335,7 +366,7 @@ const Executions = () => {
                                     : 'bg-gray-50 dark:bg-gray-800 text-gray-300 border-gray-100 dark:border-gray-700 cursor-not-allowed'
                                 }`}
                         >
-                            {info.row.original.status === 'running' ? 'Extrayendo...' : 'Ver Resultados'}
+                            {status === 'running' ? 'Extrayendo...' : 'Ver Resultados'}
                             <FiArrowRight size={13} className={isFinished ? 'group-hover:translate-x-0.5 transition-transform' : ''} />
                         </button>
                     </div>
@@ -343,7 +374,7 @@ const Executions = () => {
             },
         }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    ], [maxLeadsPerSearch]);
+    ], [maxLeadsPerSearch, relaunchingId, relaunchError, handleRelaunch]);
 
     const table = useReactTable({
         data, columns, pageCount,
