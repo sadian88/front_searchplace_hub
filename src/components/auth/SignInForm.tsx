@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { FiEye, FiEyeOff, FiAlertCircle, FiArrowRight } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiAlertCircle, FiArrowRight, FiMail, FiRefreshCw, FiCheckCircle } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
 
@@ -10,6 +10,9 @@ export default function SignInForm() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [resending, setResending] = useState(false);
+  const [resendDone, setResendDone] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -18,14 +21,34 @@ export default function SignInForm() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setUnverifiedEmail('');
+    setResendDone(false);
     try {
       const response = await api.post('/auth/login', { username, password });
       await login(response.data.token);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Usuario o contraseña incorrectos');
+      const code = err.response?.data?.code;
+      if (code === 'EMAIL_NOT_VERIFIED') {
+        setUnverifiedEmail(err.response.data.email || username);
+      } else {
+        setError(err.response?.data?.message || 'Usuario o contraseña incorrectos');
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResending(true);
+    setResendDone(false);
+    try {
+      await api.post('/auth/resend-verification', { email: unverifiedEmail });
+    } catch {
+      // endpoint siempre retorna 200
+    } finally {
+      setResendDone(true);
+      setResending(false);
     }
   };
 
@@ -95,11 +118,43 @@ export default function SignInForm() {
           </div>
         </div>
 
-        {/* Error */}
+        {/* Error genérico */}
         {error && (
           <div className="flex items-center gap-2.5 px-4 py-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl">
             <FiAlertCircle size={15} className="text-red-500 shrink-0" />
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* Email no verificado */}
+        {unverifiedEmail && (
+          <div className="px-4 py-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl space-y-3">
+            <div className="flex items-start gap-2.5">
+              <FiMail size={15} className="text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                Debes verificar tu email antes de ingresar. Revisa{" "}
+                <span className="font-semibold">{unverifiedEmail}</span>.
+              </p>
+            </div>
+            {resendDone ? (
+              <div className="flex items-center gap-1.5 text-xs text-success-600 dark:text-success-400 font-semibold">
+                <FiCheckCircle size={13} />
+                Correo de verificación reenviado
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resending}
+                className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:underline disabled:opacity-60"
+              >
+                {resending
+                  ? <FiRefreshCw size={12} className="animate-spin" />
+                  : <FiRefreshCw size={12} />
+                }
+                {resending ? "Reenviando..." : "Reenviar correo de verificación"}
+              </button>
+            )}
           </div>
         )}
 

@@ -9,6 +9,7 @@ import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import ForgotPassword from "./pages/AuthPages/ForgotPassword";
 import ResetPassword from "./pages/AuthPages/ResetPassword";
+import VerifyEmail from "./pages/AuthPages/VerifyEmail";
 import NotFound from "./pages/OtherPage/NotFound";
 
 // Public Pages
@@ -76,6 +77,7 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           {/* Fallback */}
           <Route path="*" element={<NotFound />} />
