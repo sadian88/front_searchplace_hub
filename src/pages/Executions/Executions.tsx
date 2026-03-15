@@ -332,7 +332,7 @@ const Executions = () => {
                 const isFinished = status === 'terminado';
                 const isFailed = status === 'fallido';
                 const isRelaunching = relaunchingId === exec.id;
-                const rowError = relaunchError?.id === exec.id ? relaunchError.msg : null;
+                const rowError = relaunchError?.id === exec.id ? relaunchError!.msg : null;
 
                 if (isFailed) {
                     return (

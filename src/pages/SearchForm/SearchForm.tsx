@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
     FiPlay, FiMapPin, FiSearch, FiCrosshair, FiCheckCircle,
     FiGlobe, FiCircle, FiOctagon, FiUsers, FiAlertTriangle,
-    FiZap, FiLock, FiStar, FiX, FiChevronDown, FiSliders,
+    FiZap, FiLock, FiStar, FiX, FiSliders,
 } from "react-icons/fi";
 import MapSelector from '../../components/map/MapSelector';
 import PageMeta from '../../components/common/PageMeta';
@@ -198,8 +198,6 @@ const SearchForm = () => {
             setLoading(false);
         }
     };
-
-    const concurrentStatus = isAtConcurrentLimit ? 'limit' : runningCount > 0 ? 'busy' : 'free';
 
     return (
         <>
