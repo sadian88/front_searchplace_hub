@@ -62,8 +62,9 @@ export default function PaymentPending() {
 
         <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
           <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Procesado por</span>
-          <div className="bg-white rounded-lg px-2 py-1 border border-gray-200">
-            <img src="/images/mp-logo.png" alt="MercadoPago" className="h-5 w-auto object-contain" />
+          <img src="/images/MP_Icono.png.png" alt="MercadoPago" className="w-6 h-6 object-contain" />
+          <div className="bg-white rounded-lg px-2 py-0.5 border border-gray-200">
+            <img src="/images/mp-logo.png" alt="" className="h-4 w-auto object-contain" aria-hidden="true" />
           </div>
         </div>
       </div>

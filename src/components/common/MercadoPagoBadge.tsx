@@ -1,31 +1,33 @@
 import { ShieldCheck } from "lucide-react";
 
-/* Ícono oficial de MercadoPago como SVG inline */
+const MP_ICON = "/images/MP_Icono.png.png";
+const MP_LOGO = "/images/mp-logo.png";
+
+/* Ícono oficial de MercadoPago — fondo transparente */
 export function MercadoPagoIcon({ size = 20 }: { size?: number }) {
   return (
-    <svg
+    <img
+      src={MP_ICON}
+      alt="MercadoPago"
       width={size}
       height={size}
-      viewBox="0 0 40 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="MercadoPago"
-    >
-      <rect width="40" height="40" rx="8" fill="#009EE3" />
-      <text
-        x="50%"
-        y="52%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fill="white"
-        fontFamily="Arial, sans-serif"
-        fontSize="15"
-        fontWeight="bold"
-        letterSpacing="-0.5"
-      >
-        mp
-      </text>
-    </svg>
+      style={{ width: size, height: size }}
+      className="object-contain inline-block"
+    />
+  );
+}
+
+/* Logo horizontal completo (para contextos con más espacio) */
+export function MercadoPagoLogo({ height = 20 }: { height?: number }) {
+  return (
+    <div className="bg-white rounded-lg px-2 py-0.5 border border-gray-200 inline-flex items-center">
+      <img
+        src={MP_LOGO}
+        alt="MercadoPago"
+        style={{ height }}
+        className="w-auto object-contain"
+      />
+    </div>
   );
 }
 
@@ -38,10 +40,10 @@ export function SecurePaymentBadge() {
         <span className="text-xs font-semibold">Pago 100% seguro</span>
       </div>
       <span className="text-gray-300 dark:text-gray-600 text-xs">|</span>
-      <div className="flex items-center gap-1.5">
-        <MercadoPagoIcon size={18} />
+      <div className="flex items-center gap-2">
+        <MercadoPagoIcon size={22} />
         <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">
-          Procesado por MercadoPago
+          MercadoPago
         </span>
       </div>
     </div>

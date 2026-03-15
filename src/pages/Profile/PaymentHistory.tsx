@@ -147,8 +147,9 @@ export default function PaymentHistory() {
         {/* MP brand strip */}
         <div className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm w-fit">
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pagos procesados por</span>
-          <div className="bg-white rounded-lg px-3 py-1 border border-gray-200">
-            <img src="/images/mp-logo.png" alt="MercadoPago" className="h-6 w-auto object-contain" />
+          <img src="/images/MP_Icono.png.png" alt="MercadoPago" className="w-7 h-7 object-contain" />
+          <div className="bg-white rounded-lg px-2 py-0.5 border border-gray-200">
+            <img src="/images/mp-logo.png" alt="" className="h-5 w-auto object-contain" aria-hidden="true" />
           </div>
         </div>
 
