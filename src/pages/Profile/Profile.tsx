@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCheckCircle, FiShield, FiTrendingUp, FiCalendar } from "react-icons/fi";
+import { useNavigate } from "react-router";
+import { FiUser, FiMail, FiEdit2, FiSave, FiX, FiCheckCircle, FiShield, FiTrendingUp, FiCalendar, FiCreditCard } from "react-icons/fi";
 import PageMeta from "../../components/common/PageMeta";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
@@ -401,61 +402,79 @@ function StatChip({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
+/* ── shared profile hero + sub-nav (used by Profile & PaymentHistory) ───── */
+
+export function ProfileHero({ activeTab }: { activeTab: 'perfil' | 'pagos' }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const tabs = [
+    { key: 'perfil', label: 'Perfil', icon: <FiUser size={13} />, path: '/profile' },
+    { key: 'pagos',  label: 'Pagos',  icon: <FiCreditCard size={13} />, path: '/profile/payments' },
+  ] as const;
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-2xl shadow-lg"
+      style={{ background: "linear-gradient(135deg, #030711 0%, #0c1428 50%, #030711 100%)" }}
+    >
+      <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
+        style={{ backgroundImage: "radial-gradient(circle, #94a3b8 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+      <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "rgba(37,99,235,0.18)" }} />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
+
+      {/* User info row */}
+      <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 px-6 pt-6 pb-4">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500/30 to-brand-700/30 border border-brand-500/30 flex items-center justify-center text-white text-xl font-extrabold shrink-0">
+          {user ? `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase() || "?" : "?"}
+        </div>
+        <div className="flex-1">
+          <h1 className="text-lg font-extrabold text-white leading-tight">
+            {user ? `${user.first_name} ${user.last_name}` : "Mi Perfil"}
+          </h1>
+          <p className="text-white/60 text-xs mt-0.5">{user?.email}</p>
+          <div className="flex flex-wrap gap-2 mt-2">
+            <StatChip icon={<FiShield size={12} />} label={user?.plan.display_name ?? "Free"} />
+            {user?.plan.expires_at ? (
+              <StatChip icon={<FiCalendar size={12} />}
+                label={`Corte: ${new Date(user.plan.expires_at).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" })}`} />
+            ) : user?.plan.price_monthly === 0 ? (
+              <StatChip icon={<FiCalendar size={12} />} label="Sin fecha de corte" />
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {/* Tab nav */}
+      <div className="relative flex gap-1 px-4 pb-0">
+        {tabs.map(t => (
+          <button
+            key={t.key}
+            onClick={() => navigate(t.path)}
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-t-xl border-b-2 transition-all ${
+              activeTab === t.key
+                ? 'text-white border-brand-400 bg-white/10'
+                : 'text-white/50 border-transparent hover:text-white/80 hover:bg-white/5'
+            }`}
+          >
+            {t.icon}
+            {t.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── página principal ────────────────────────────────────────────────────── */
 
 export default function Profile() {
-  const { user } = useAuth();
-
   return (
     <>
       <PageMeta title="Mi Perfil | Places Hub" description="Gestiona tu perfil y plan de suscripción" />
-
       <div className="space-y-6">
-        {/* Hero */}
-        <div
-          className="relative overflow-hidden rounded-2xl p-6 lg:p-8 shadow-lg"
-          style={{ background: "linear-gradient(135deg, #030711 0%, #0c1428 50%, #030711 100%)" }}
-        >
-          {/* Dot grid */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.04]"
-            style={{ backgroundImage: "radial-gradient(circle, #94a3b8 1px, transparent 1px)", backgroundSize: "28px 28px" }}
-          />
-          {/* Glow orbs */}
-          <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "rgba(37,99,235,0.18)" }} />
-          <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full blur-3xl" style={{ background: "rgba(124,58,237,0.10)" }} />
-          {/* Top accent line */}
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
-          <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/30 to-brand-700/30 border border-brand-500/30 flex items-center justify-center text-white text-2xl font-extrabold shrink-0">
-              {user
-                ? `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase() || "?"
-                : "?"}
-            </div>
-            <div className="flex-1">
-              <h1 className="text-xl font-extrabold text-white leading-tight">
-                {user ? `${user.first_name} ${user.last_name}` : "Mi Perfil"}
-              </h1>
-              <p className="text-white/70 text-sm mt-0.5">{user?.email}</p>
-              <div className="flex flex-wrap gap-2 mt-3">
-                <StatChip icon={<FiShield size={12} />} label={user?.plan.display_name ?? "Free"} />
-                {user?.plan.expires_at ? (
-                  <StatChip
-                    icon={<FiCalendar size={12} />}
-                    label={`Corte: ${new Date(user.plan.expires_at).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" })}`}
-                  />
-                ) : user?.plan.price_monthly === 0 ? (
-                  <StatChip icon={<FiCalendar size={12} />} label="Sin fecha de corte" />
-                ) : null}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Uso del plan — visible al inicio */}
+        <ProfileHero activeTab="perfil" />
         <UsageCard />
-
-        {/* Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <BasicDataCard />
           <PlanCard />

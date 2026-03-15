@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { FiCheckCircle } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
@@ -6,11 +6,30 @@ import { useAuth } from "../../context/AuthContext";
 export default function PaymentSuccess() {
   const { refreshUser, user } = useAuth();
   const navigate = useNavigate();
-  const [refreshed, setRefreshed] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [planReady, setPlanReady] = useState(false);
+  const initialPlanIdRef = useRef(user?.plan?.id);
 
+  // Poll refreshUser up to 8 times (every 2s) until the plan actually changes
   useEffect(() => {
-    refreshUser().finally(() => setRefreshed(true));
-  }, [refreshUser]);
+    if (planReady) return;
+
+    const timer = setTimeout(async () => {
+      await refreshUser();
+      setAttempts(a => a + 1);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [attempts, planReady, refreshUser]);
+
+  // Detect plan change
+  useEffect(() => {
+    if (user?.plan && user.plan.id !== initialPlanIdRef.current) {
+      setPlanReady(true);
+    }
+    // After 8 attempts (~16s) give up waiting and show button anyway
+    if (attempts >= 8) setPlanReady(true);
+  }, [user, attempts]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
@@ -25,23 +44,30 @@ export default function PaymentSuccess() {
           ¡Pago exitoso!
         </h1>
 
-        {refreshed && user?.plan ? (
+        {planReady ? (
           <p className="text-gray-500 dark:text-gray-400 mb-6">
             Tu plan ha sido actualizado a{" "}
             <span className="font-bold text-gray-800 dark:text-white">
-              {user.plan.display_name}
+              {user?.plan?.display_name}
             </span>
             . Ya puedes disfrutar de todos los beneficios.
           </p>
         ) : (
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
-            Actualizando tu plan{refreshed ? "..." : <span className="inline-block w-3 h-3 border-2 border-brand-300 border-t-brand-600 rounded-full animate-spin ml-1 align-middle" />}
-          </p>
+          <div className="mb-6 space-y-3">
+            <p className="text-gray-500 dark:text-gray-400">
+              Confirmando tu pago con MercadoPago...
+            </p>
+            <div className="flex items-center justify-center gap-2 text-xs text-brand-500 font-semibold">
+              <span className="inline-block w-3.5 h-3.5 border-2 border-brand-300 border-t-brand-600 rounded-full animate-spin" />
+              Verificando ({Math.min(attempts + 1, 8)}/8)
+            </div>
+          </div>
         )}
 
         <button
-          onClick={() => navigate("/dashboard")}
-          className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition-colors"
+          onClick={() => navigate("/")}
+          disabled={!planReady}
+          className="w-full py-3 bg-brand-600 hover:bg-brand-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors"
         >
           Ir al dashboard
         </button>

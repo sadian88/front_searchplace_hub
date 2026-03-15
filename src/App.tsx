@@ -20,6 +20,7 @@ import Executions from "./pages/Executions/Executions";
 import ExecutionDetails from "./pages/ExecutionDetails/ExecutionDetails";
 import PlaceDetail from "./pages/PlaceDetail/PlaceDetail";
 import Profile from "./pages/Profile/Profile";
+import PaymentHistory from "./pages/Profile/PaymentHistory";
 import PaymentSuccess from "./pages/Payment/PaymentSuccess";
 import PaymentPending from "./pages/Payment/PaymentPending";
 import PaymentFailure from "./pages/Payment/PaymentFailure";
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="/executions/:id" element={<ExecutionDetails />} />
             <Route path="/places/:id" element={<PlaceDetail />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/payments" element={<PaymentHistory />} />
           </Route>
 
           {/* Payment Routes (public — MP redirects here after checkout) */}

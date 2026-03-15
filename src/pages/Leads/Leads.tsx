@@ -8,7 +8,7 @@ import {
     createColumnHelper,
     type PaginationState,
 } from '@tanstack/react-table';
-import { FiSearch, FiStar, FiTag, FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiGlobe, FiExternalLink, FiMapPin, FiHome, FiArrowLeft, FiCalendar } from "react-icons/fi";
+import { FiSearch, FiStar, FiTag, FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiGlobe, FiExternalLink, FiMapPin, FiHome, FiArrowLeft, FiCalendar, FiFilter } from "react-icons/fi";
 import PageMeta from '../../components/common/PageMeta';
 
 /* ── status helpers ───────────────────────────────────────────────────────── */
@@ -22,18 +22,28 @@ const STATUS_STYLES: Record<string, string> = {
 
 /* ── component ────────────────────────────────────────────────────────────── */
 
+const PAGE_SIZE = 5;
+
 const Leads = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const executionId = searchParams.get('execution');
 
     const [execution, setExecution] = useState<any>(null);
+    const [executions, setExecutions] = useState<any[]>([]);
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [totalLeads, setTotalLeads] = useState(0);
-    const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+    const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: PAGE_SIZE });
     const [pageCount, setPageCount] = useState(0);
+
+    // Load executions list for the filter dropdown (only terminado ones)
+    useEffect(() => {
+        api.get('/executions', { params: { limit: 100 } })
+            .then(r => setExecutions((r.data.data || []).filter((e: any) => e.status === 'terminado')))
+            .catch(() => {});
+    }, []);
 
     const fetchData = async () => {
         setLoading(true);
@@ -63,7 +73,7 @@ const Leads = () => {
 
     // Reset page when switching between all-leads / execution mode
     useEffect(() => {
-        setPagination({ pageIndex: 0, pageSize: 10 });
+        setPagination({ pageIndex: 0, pageSize: PAGE_SIZE });
         setExecution(null);
     }, [executionId]);
 
@@ -239,44 +249,77 @@ const Leads = () => {
 
             <div className="space-y-6">
 
-                {/* ── Execution mode: back button + context ── */}
+                {/* ── Execution mode: header + controls ── */}
                 {executionId && (
-                    <>
-                        <button
-                            onClick={() => navigate('/executions')}
-                            className="flex items-center gap-2 text-xs font-semibold text-gray-400 dark:text-gray-500 hover:text-brand-500 dark:hover:text-brand-400 border border-gray-200 dark:border-gray-700 px-5 py-2.5 rounded-xl w-fit uppercase tracking-widest transition-all bg-white dark:bg-gray-800 group"
-                        >
-                            <FiArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
-                            Volver al historial
-                        </button>
-
-                        <div className="flex flex-col xl:flex-row justify-between xl:items-end gap-4">
-                            <div className="space-y-2">
+                    <div className="space-y-4">
+                        {/* Title row */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
                                 <h1 className="text-3xl font-bold text-gray-800 dark:text-white/90 tracking-tight">
-                                    Resultados de Búsqueda
+                                    Leads Hub
                                 </h1>
-                                {execution && (
-                                    <div className="flex flex-wrap gap-2">
-                                        <span className="text-[10px] bg-brand-500 text-white px-4 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-md shadow-brand-500/20">
-                                            {execution.search_term}
-                                        </span>
-                                        <span className="text-[10px] bg-white dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700 px-4 py-1.5 rounded-lg font-bold uppercase tracking-widest">
-                                            {execution.location}
-                                        </span>
-                                        <span className="inline-flex items-center gap-1.5 text-[10px] bg-gray-50 dark:bg-gray-700 text-gray-400 border border-gray-100 dark:border-gray-600 px-4 py-1.5 rounded-lg font-bold uppercase tracking-widest">
-                                            <FiCalendar size={10} />
-                                            {new Date(execution.created_at).toLocaleDateString()}
-                                        </span>
-                                    </div>
-                                )}
+                                <p className="text-gray-500 dark:text-gray-400 text-sm border-l-4 border-brand-500 pl-3 mt-1">
+                                    Resultados filtrados por búsqueda
+                                </p>
                             </div>
-                            <div className="px-5 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl flex items-center gap-3 shadow-sm shrink-0">
+                            {/* total badge */}
+                            <div className="px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl flex items-center gap-3 shadow-sm shrink-0 self-start sm:self-auto">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total</span>
-                                <span className="text-2xl font-bold text-gray-800 dark:text-white/90">{totalLeads}</span>
+                                <span className="text-2xl font-bold text-gray-800 dark:text-white/90 tabular-nums">{totalLeads}</span>
                                 <span className="text-brand-400 font-semibold text-sm italic">leads</span>
                             </div>
                         </div>
-                    </>
+
+                        {/* Controls row: current execution pills + switcher + clear */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            {/* Current execution context */}
+                            {execution && (
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-[10px] bg-brand-500 text-white px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest shadow-sm shadow-brand-500/20">
+                                        {execution.search_term}
+                                    </span>
+                                    <span className="text-[10px] bg-white dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest">
+                                        {execution.location}
+                                    </span>
+                                    <span className="inline-flex items-center gap-1 text-[10px] bg-gray-50 dark:bg-gray-700 text-gray-400 border border-gray-100 dark:border-gray-600 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest">
+                                        <FiCalendar size={9} />
+                                        {new Date(execution.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Divider */}
+                            <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 hidden sm:block" />
+
+                            {/* Execution switcher */}
+                            {executions.length > 0 && (
+                                <div className="relative group">
+                                    <FiFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors pointer-events-none" size={13} />
+                                    <select
+                                        value={executionId ?? ''}
+                                        onChange={e => e.target.value ? navigate(`/leads?execution=${e.target.value}`) : navigate('/leads')}
+                                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 pl-8 pr-4 py-2 text-xs font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-300 dark:text-white/90 transition-all appearance-none cursor-pointer max-w-[220px]"
+                                    >
+                                        <option value="">Cambiar búsqueda...</option>
+                                        {executions.map(e => (
+                                            <option key={e.id} value={e.id}>
+                                                {e.search_term} · {e.location} ({new Date(e.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* Ver todos button */}
+                            <button
+                                onClick={() => navigate('/leads')}
+                                className="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-xl transition-all bg-white dark:bg-gray-800 group whitespace-nowrap"
+                            >
+                                <FiArrowLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
+                                Ver todos
+                            </button>
+                        </div>
+                    </div>
                 )}
 
                 {/* ── All-leads mode: header + search ── */}
@@ -288,8 +331,27 @@ const Leads = () => {
                                 Gestiona y califica tus prospectos recolectados
                             </p>
                         </div>
-                        <div className="flex gap-3 w-full xl:w-auto">
-                            <div className="relative flex-1 xl:w-80 group">
+                        <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+                            {/* Execution filter */}
+                            {executions.length > 0 && (
+                                <div className="relative group">
+                                    <FiFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors pointer-events-none" size={14} />
+                                    <select
+                                        value=""
+                                        onChange={e => { if (e.target.value) navigate(`/leads?execution=${e.target.value}`); }}
+                                        className="w-full sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 pl-8 pr-4 py-2.5 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-300 dark:text-white/90 transition-all appearance-none cursor-pointer"
+                                    >
+                                        <option value="">Filtrar por búsqueda...</option>
+                                        {executions.map(e => (
+                                            <option key={e.id} value={e.id}>
+                                                {e.search_term} · {e.location} ({new Date(e.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                            {/* Name/category search */}
+                            <div className="relative flex-1 xl:w-72 group">
                                 <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-500 transition-colors" size={15} />
                                 <input
                                     type="text"
@@ -353,7 +415,7 @@ const Leads = () => {
                                         onChange={e => table.setPageSize(Number(e.target.value))}
                                         className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-brand-500/20 outline-none dark:text-white/90"
                                     >
-                                        {[10, 20, 30, 50].map(s => <option key={s} value={s}>{s}</option>)}
+                                        {[5, 10, 20, 50].map(s => <option key={s} value={s}>{s}</option>)}
                                     </select>
                                 </div>
                             )}

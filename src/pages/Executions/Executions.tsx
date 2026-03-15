@@ -109,7 +109,7 @@ const Executions = () => {
     const [relaunchingId, setRelaunchingId] = useState<string | null>(null);
     const [relaunchError, setRelaunchError] = useState<{ id: string; msg: string } | null>(null);
 
-    const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+    const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
     const [pageCount, setPageCount] = useState(0);
 
     const maxLeadsPerSearch = user?.plan.max_leads_per_search ?? null;
