@@ -64,9 +64,17 @@ export default function SignInForm() {
 
         {/* Password */}
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-            Contraseña
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+              Contraseña
+            </label>
+            <Link
+              to="/forgot-password"
+              className="text-xs text-brand-600 dark:text-brand-400 font-semibold hover:underline transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
