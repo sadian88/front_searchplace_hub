@@ -62,6 +62,9 @@ const planColors: Record<string, { ring: string; badge: string; icon: string }> 
   medium:   { ring: "border-purple-200 dark:border-purple-500/30",  badge: "bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300", icon: "text-purple-500" },
 };
 
+const fmtCOP = (val: number) =>
+  val === 0 ? '$0' : '$' + val.toLocaleString('es-CO');
+
 const supportLabel: Record<string, string> = {
   email:     "Soporte por email",
   priority:  "Soporte prioritario",
@@ -169,7 +172,7 @@ export default function PlanCard({ compact = false }: { compact?: boolean }) {
                 <div className="flex items-center gap-2">
                   <img src="/images/MP_Icono.png.png" alt="MercadoPago" className="w-5 h-5 object-contain shrink-0" />
                   <span className="text-sm font-extrabold text-brand-600 dark:text-brand-400">
-                    ${p.price_monthly}/mes
+                    {fmtCOP(p.price_monthly)}/mes
                   </span>
                   {upgradingTo === p.name && (
                     <span className="inline-block w-3.5 h-3.5 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
@@ -201,7 +204,7 @@ export default function PlanCard({ compact = false }: { compact?: boolean }) {
       <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-end gap-1">
           <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
-            ${plan.price_monthly}
+            {fmtCOP(plan.price_monthly)}
           </span>
           <span className="text-sm text-gray-400 mb-1">/ mes</span>
         </div>
@@ -276,7 +279,7 @@ export default function PlanCard({ compact = false }: { compact?: boolean }) {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-extrabold text-brand-600 dark:text-brand-400">
-                  ${p.price_monthly}/mes
+                  {fmtCOP(p.price_monthly)}/mes
                 </span>
                 {upgradingTo === p.name && (
                   <span className="inline-block w-3.5 h-3.5 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />

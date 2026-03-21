@@ -10,9 +10,9 @@ import { MercadoPagoIcon, SecurePaymentBadge } from "../common/MercadoPagoBadge"
 import { FiMail, FiCheckCircle, FiRefreshCw } from "react-icons/fi";
 
 const PLAN_LABELS: Record<string, { label: string; price: string; description: string }> = {
-  basic:  { label: "Basic",  price: "$29/mes", description: "20 leads por búsqueda · 100 leads mensuales" },
-  medium: { label: "Medium", price: "$49/mes", description: "50 leads por búsqueda · 400 leads mensuales" },
-  pro:    { label: "Pro",    price: "$149/mes", description: "100 leads por búsqueda · 4,000 leads mensuales" },
+  basic:  { label: "Basic",  price: "$116.000/mes", description: "20 leads por búsqueda · 100 leads mensuales" },
+  medium: { label: "Medium", price: "$196.000/mes", description: "50 leads por búsqueda · 400 leads mensuales" },
+  pro:    { label: "Pro",    price: "$596.000/mes", description: "100 leads por búsqueda · 4,000 leads mensuales" },
 };
 
 export default function SignUpForm() {

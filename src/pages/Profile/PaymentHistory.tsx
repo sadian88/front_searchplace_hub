@@ -219,7 +219,7 @@ export default function PaymentHistory() {
                       Suscripción activa
                     </p>
                     <p className="text-base font-extrabold text-gray-800 dark:text-white">
-                      Plan {subscription.plan_name} — ${subscription.price_monthly}/mes
+                      Plan {subscription.plan_name} — {'$' + subscription.price_monthly.toLocaleString('es-CO')}/mes
                     </p>
                     {subscription.next_payment_date && subscription.mp_status === 'authorized' && (
                       <p className="text-xs text-gray-400 mt-0.5">

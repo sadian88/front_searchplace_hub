@@ -605,7 +605,7 @@ const plans: Plan[] = [
   },
   {
     name: "Basic",
-    price: "$29",
+    price: "$116.000",
     period: "por mes",
     description: "Para profesionales que comienzan a generar leads.",
     features: [
@@ -622,7 +622,7 @@ const plans: Plan[] = [
   },
   {
     name: "Medium",
-    price: "$49",
+    price: "$196.000",
     period: "por mes",
     description: "Para equipos de ventas que necesitan resultados consistentes.",
     features: [
@@ -640,7 +640,7 @@ const plans: Plan[] = [
   },
   {
     name: "Pro",
-    price: "$149",
+    price: "$596.000",
     period: "por mes",
     description: "Para agencias y equipos comerciales de alto volumen.",
     features: [
