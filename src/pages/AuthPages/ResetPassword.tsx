@@ -46,7 +46,7 @@ export default function ResetPassword() {
   if (!token) {
     return (
       <>
-        <PageMeta title="Enlace inválido | PlacesHub" description="" />
+        <PageMeta title="Enlace inválido | Places Hub" description="" />
         <AuthLayout>
           <div className="text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center mx-auto">
@@ -71,7 +71,7 @@ export default function ResetPassword() {
   return (
     <>
       <PageMeta
-        title="Nueva contraseña | PlacesHub"
+        title="Nueva contraseña | Places Hub"
         description="Establece una nueva contraseña para tu cuenta"
       />
       <AuthLayout>

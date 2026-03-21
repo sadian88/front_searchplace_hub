@@ -6,8 +6,8 @@ export default function SignIn() {
   return (
     <>
       <PageMeta
-        title="SignIn | PlacesHub"
-        description="Ingresa a tu cuenta en PlacesHub"
+        title="Iniciar sesión | Places Hub"
+        description="Ingresa a tu cuenta en Places Hub"
       />
       <AuthLayout>
         <SignInForm />

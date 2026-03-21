@@ -70,8 +70,8 @@ export default function VerifyEmail() {
   return (
     <>
       <PageMeta
-        title="Verificando cuenta | PlacesHub"
-        description="Activando tu cuenta en PlacesHub"
+        title="Verificando cuenta | Places Hub"
+        description="Activando tu cuenta en Places Hub"
       />
       <AuthLayout>
         <div className="text-center space-y-6">

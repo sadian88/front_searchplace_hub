@@ -28,8 +28,8 @@ export default function ForgotPassword() {
   return (
     <>
       <PageMeta
-        title="Recuperar contraseña | PlacesHub"
-        description="Recupera el acceso a tu cuenta en PlacesHub"
+        title="Recuperar contraseña | Places Hub"
+        description="Recupera el acceso a tu cuenta en Places Hub"
       />
       <AuthLayout>
         <div>
