@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import AuthLayout from "./AuthPageLayout";
 import PageMeta from "../../components/common/PageMeta";
 
-type Status = "verifying" | "success" | "redirecting_payment" | "error";
+type Status = "verifying" | "success" | "redirecting_payment" | "payment_error" | "error";
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
@@ -16,6 +16,7 @@ export default function VerifyEmail() {
 
   const [status, setStatus] = useState<Status>("verifying");
   const [errorMsg, setErrorMsg] = useState("");
+  const [pendingPlanName, setPendingPlanName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -34,16 +35,18 @@ export default function VerifyEmail() {
         // Si había un plan pendiente de pago, retomar el flujo de MP
         const pendingPlan = localStorage.getItem('pending_plan');
         if (pendingPlan) {
-          localStorage.removeItem('pending_plan');
+          setPendingPlanName(pendingPlan);
           setStatus("redirecting_payment");
           try {
             const prefRes = await api.post<{ init_point: string }>("/payments/create-subscription", {
               planName: pendingPlan,
             });
+            localStorage.removeItem('pending_plan'); // solo eliminar si fue exitoso
             window.location.href = prefRes.data.init_point;
-          } catch {
-            // Si falla el pago, igual entrar al dashboard — pueden reintentar desde Perfil
-            navigate("/dashboard");
+          } catch (err: any) {
+            const msg = err.response?.data?.message || 'No se pudo iniciar el pago.';
+            setErrorMsg(msg);
+            setStatus("payment_error");
           }
           return;
         }
@@ -132,6 +135,51 @@ export default function VerifyEmail() {
               >
                 Ir al dashboard ahora
               </button>
+            </>
+          )}
+
+          {status === "payment_error" && (
+            <>
+              <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center mx-auto">
+                <FiCreditCard size={30} className="text-amber-500" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">
+                  Cuenta verificada
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  Tu cuenta está activa, pero no pudimos iniciar el pago del plan{" "}
+                  {pendingPlanName && <span className="font-semibold capitalize text-gray-700 dark:text-gray-200">{pendingPlanName}</span>}.
+                </p>
+                <p className="text-xs text-error-500 dark:text-error-400">{errorMsg}</p>
+              </div>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={async () => {
+                    const plan = localStorage.getItem('pending_plan');
+                    if (!plan) { navigate("/dashboard"); return; }
+                    setStatus("redirecting_payment");
+                    setErrorMsg("");
+                    try {
+                      const { data } = await api.post<{ init_point: string }>("/payments/create-subscription", { planName: plan });
+                      localStorage.removeItem('pending_plan');
+                      window.location.href = data.init_point;
+                    } catch (err: any) {
+                      setErrorMsg(err.response?.data?.message || 'Error al iniciar el pago.');
+                      setStatus("payment_error");
+                    }
+                  }}
+                  className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition-colors text-sm"
+                >
+                  Reintentar pago
+                </button>
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="w-full py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+                >
+                  Ir al dashboard y pagar luego desde Perfil
+                </button>
+              </div>
             </>
           )}
 
