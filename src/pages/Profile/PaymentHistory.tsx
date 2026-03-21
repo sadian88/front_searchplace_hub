@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { FiCreditCard, FiCalendar, FiSearch, FiChevronDown, FiChevronUp, FiExternalLink, FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
+import { FiCreditCard, FiCalendar, FiSearch, FiChevronDown, FiChevronUp, FiExternalLink, FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiRefreshCw, FiXCircle, FiPauseCircle } from "react-icons/fi";
 import PageMeta from "../../components/common/PageMeta";
 import api from "../../api/api";
+import { useAuth } from "../../context/AuthContext";
 import { ProfileHero } from "./Profile";
 
 /* ── types & constants ───────────────────────────────────────────────────── */
@@ -14,6 +15,42 @@ interface Payment {
   created_at: string;
   plan_name: string;
 }
+
+interface Subscription {
+  id: number;
+  mp_preapproval_id: string;
+  mp_status: string;
+  next_payment_date: string | null;
+  plan_name: string;
+  price_monthly: number;
+}
+
+const SUB_STATUS_MAP: Record<string, { label: string; cls: string; dot: string; Icon: React.ElementType }> = {
+  authorized: {
+    label: 'Activa',
+    cls: 'bg-success-50 text-success-600 border-success-200 dark:bg-success-500/10 dark:text-success-400 dark:border-success-500/20',
+    dot: 'bg-success-500',
+    Icon: FiRefreshCw,
+  },
+  pending: {
+    label: 'Pendiente de aprobación',
+    cls: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+    dot: 'bg-amber-400',
+    Icon: FiRefreshCw,
+  },
+  paused: {
+    label: 'Pausada (pago fallido)',
+    cls: 'bg-error-50 text-error-600 border-error-200 dark:bg-error-500/10 dark:text-error-400 dark:border-error-500/20',
+    dot: 'bg-error-500',
+    Icon: FiPauseCircle,
+  },
+  cancelled: {
+    label: 'Cancelada',
+    cls: 'bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600',
+    dot: 'bg-gray-400',
+    Icon: FiXCircle,
+  },
+};
 
 const STATUS_MAP: Record<string, { label: string; cls: string; dot: string }> = {
   approved: {
@@ -88,8 +125,11 @@ function PaymentDetail({ p }: { p: Payment }) {
 /* ── main page ───────────────────────────────────────────────────────────── */
 
 export default function PaymentHistory() {
+  const { refreshUser } = useAuth();
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [subscription, setSubscription] = useState<Subscription | null | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // pagination
@@ -103,11 +143,25 @@ export default function PaymentHistory() {
   const [dateTo, setDateTo] = useState('');
 
   useEffect(() => {
-    api.get<Payment[]>('/payments/history')
-      .then(r => setPayments(r.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      api.get<Payment[]>('/payments/history').then(r => setPayments(r.data)),
+      api.get<Subscription | null>('/payments/subscription').then(r => setSubscription(r.data)),
+    ]).catch(() => {}).finally(() => setLoading(false));
   }, []);
+
+  const handleCancel = async () => {
+    if (!confirm('¿Estás seguro de que deseas cancelar tu suscripción? Tu plan se degradará a Free.')) return;
+    setCancelling(true);
+    try {
+      await api.post('/payments/cancel-subscription');
+      setSubscription(prev => prev ? { ...prev, mp_status: 'cancelled' } : null);
+      if (refreshUser) await refreshUser();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Error al cancelar la suscripción.');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     setPage(1);
@@ -152,6 +206,56 @@ export default function PaymentHistory() {
             <img src="/images/mp-logo.png" alt="" className="h-5 w-auto object-contain" aria-hidden="true" />
           </div>
         </div>
+
+        {/* Active subscription card */}
+        {subscription !== undefined && subscription !== null && (
+          (() => {
+            const st = SUB_STATUS_MAP[subscription.mp_status] ?? SUB_STATUS_MAP.cancelled;
+            return (
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">
+                      Suscripción activa
+                    </p>
+                    <p className="text-base font-extrabold text-gray-800 dark:text-white">
+                      Plan {subscription.plan_name} — ${subscription.price_monthly}/mes
+                    </p>
+                    {subscription.next_payment_date && subscription.mp_status === 'authorized' && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Próximo cobro:{' '}
+                        <span className="font-semibold text-gray-600 dark:text-gray-300">
+                          {new Date(subscription.next_payment_date).toLocaleDateString('es-CO', {
+                            day: '2-digit', month: 'long', year: 'numeric',
+                          })}
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border ${st.cls}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
+                      {st.label}
+                    </span>
+                    {subscription.mp_status === 'authorized' && (
+                      <button
+                        onClick={handleCancel}
+                        disabled={cancelling}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-error-500 dark:text-error-400 border border-error-200 dark:border-error-500/30 px-3 py-1.5 rounded-lg hover:bg-error-50 dark:hover:bg-error-500/10 disabled:opacity-50 transition-all"
+                      >
+                        {cancelling
+                          ? <span className="inline-block w-3 h-3 border-2 border-error-400/30 border-t-error-400 rounded-full animate-spin" />
+                          : <FiXCircle size={12} />
+                        }
+                        Cancelar
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()
+        )}
 
         {/* Summary chips */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

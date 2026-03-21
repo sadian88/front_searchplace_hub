@@ -37,7 +37,7 @@ export default function VerifyEmail() {
           localStorage.removeItem('pending_plan');
           setStatus("redirecting_payment");
           try {
-            const prefRes = await api.post<{ init_point: string }>("/payments/create-preference", {
+            const prefRes = await api.post<{ init_point: string }>("/payments/create-subscription", {
               planName: pendingPlan,
             });
             window.location.href = prefRes.data.init_point;

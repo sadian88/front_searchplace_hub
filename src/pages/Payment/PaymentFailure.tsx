@@ -29,7 +29,7 @@ export default function PaymentFailure() {
     setRetrying(true);
     setRetryError("");
     try {
-      const { data } = await api.post<{ init_point: string }>("/payments/create-preference", {
+      const { data } = await api.post<{ init_point: string }>("/payments/create-subscription", {
         planName,
       });
       window.location.href = data.init_point;

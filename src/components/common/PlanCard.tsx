@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FiCheckCircle, FiShield, FiZap, FiTrendingUp, FiArrowUpCircle } from "react-icons/fi";
+import { FiCheckCircle, FiShield, FiZap, FiTrendingUp, FiArrowUpCircle, FiXCircle } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
 
@@ -7,6 +7,15 @@ interface Plan {
   id: number;
   name: string;
   display_name: string;
+  price_monthly: number;
+}
+
+interface Subscription {
+  id: number;
+  mp_preapproval_id: string;
+  mp_status: string;
+  next_payment_date: string | null;
+  plan_name: string;
   price_monthly: number;
 }
 
@@ -60,24 +69,41 @@ const supportLabel: Record<string, string> = {
 };
 
 export default function PlanCard({ compact = false }: { compact?: boolean }) {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const plan = user?.plan;
   const [availablePlans, setAvailablePlans] = useState<Plan[]>([]);
   const [upgradingTo, setUpgradingTo] = useState<string | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     api.get<Plan[]>('/plans').then(({ data }) => setAvailablePlans(data)).catch(() => {});
+    api.get<Subscription | null>('/payments/subscription').then(({ data }) => setSubscription(data)).catch(() => {});
   }, []);
 
   const handleUpgrade = async (planName: string) => {
     setUpgradingTo(planName);
     try {
-      const { data } = await api.post<{ init_point: string }>('/payments/create-preference', { planName });
+      const { data } = await api.post<{ init_point: string }>('/payments/create-subscription', { planName });
       window.location.href = data.init_point;
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Error al iniciar el pago.';
       alert(msg);
       setUpgradingTo(null);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm('¿Estás seguro de que deseas cancelar tu suscripción? Tu plan se degradará a Free.')) return;
+    setCancelling(true);
+    try {
+      await api.post('/payments/cancel-subscription');
+      setSubscription(prev => prev ? { ...prev, mp_status: 'cancelled' } : null);
+      if (refreshUser) await refreshUser();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Error al cancelar la suscripción.');
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -258,6 +284,23 @@ export default function PlanCard({ compact = false }: { compact?: boolean }) {
               </div>
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Cancel subscription */}
+      {subscription?.mp_status === 'authorized' && (
+        <div className="px-6 pb-6 border-t border-gray-100 dark:border-gray-700 pt-4">
+          <button
+            onClick={handleCancel}
+            disabled={cancelling}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-error-500 dark:text-error-400 border border-error-200 dark:border-error-500/30 rounded-xl hover:bg-error-50 dark:hover:bg-error-500/10 disabled:opacity-50 transition-all"
+          >
+            {cancelling
+              ? <span className="inline-block w-3 h-3 border-2 border-error-400/30 border-t-error-400 rounded-full animate-spin" />
+              : <FiXCircle size={14} />
+            }
+            Cancelar suscripción
+          </button>
         </div>
       )}
     </div>
